@@ -1,5 +1,60 @@
 Backgammon
-=============
-Projet de backgammon dans le cadre
-du projet de langage proc�dural C
-Salut quentin!!
+=====================================
+Projet de backgammon dans le cadre du projet de langage procédural C.
+
+1. Instructions de compilation
+=====================================
+- `make libai' pour compiler la librairie de l'IA.
+- `make game_engine' pour compiler le moteur de jeu.
+- `make all' pour compiler le jeu.
+
+2. Conventions de codage
+=====================================
+Les variables ne comportent pas de majuscules, sauf en cas de namespace implicite
+- Les noms des variables sont composés par des tirets bas.
+Ex: int ma_variable_longue;
+
+- De la même manière, les noms des fonctions sont séparés par des tirets bas
+Ex: double une_petite_fonction(int ma_variable);
+
+Dans l'idéal, les fonctions doivent être nommées en anglais.
+
+- L'identation suit le schéma suivant :
+Ex: 
+double une_petite_fonction(int ma_variable)
+{
+  if (cond(ma_variable))
+	{
+		// traitement
+	}
+	else
+	{
+		// sinon	
+	}
+}
+
+- Dans les expression algébriques, les structures de contrôles, des espaces
+doivent être insérés aux endroits nécessaires.
+Ex:
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+	int i = 0;
+	for (i = 0; i < 10; i = i + 1)
+	{
+		// Traitements
+		if (i == 1)
+		{
+			// i = 1 !
+		}
+	}
+	
+	return 0;
+}
+
+3. Tenue du code
+=====================================
+Les codes doivent être commentés, clairement indentés. En cas de redondance de code
+des fonctions devront être définies pour factoriser le dit code.
