@@ -1,9 +1,11 @@
+// Includes standards
 #include <stdio.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <stdbool.h>
-#include <game_engine.h>
-#include <game_ai.h>
+#include <dlfcn.h>
+// Includes persos
+#include "../include/engine.h"
+#include "../lib/game_ai.h"
 
 int main(int argc, char *argv[])
 {

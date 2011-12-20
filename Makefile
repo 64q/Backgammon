@@ -5,9 +5,10 @@
 
 # Définition des variables usuelles
 CC=gcc
-CFLAGS=-W -Wall -ansi -pedantic -std=c99
-LIB=-lSDL -lSDL_image -lSDL_ttf
+CFLAGS=-W -Wall -std=c99
+LDFLAGS=-lSDL -lSDL_image -lSDL_ttf -lSDL_gfx
 EXEC=backgammon
+LIBNAME=game_ai
 
 # Path
 OBJ=obj/
@@ -16,22 +17,38 @@ INC=include/
 SRC=src/
 LIB=lib/
 
-all:
-	@echo "Compilation du projet"
-	gcc ${SRC}backgammon.c -o ${BIN}${EXEC} -rdynamic -ldl -I${LIB} -I${INC} ${CFLAGS}
+all: ${EXEC}
 
+${EXEC}: ${OBJ}backgammon.o ${OBJ}display.o ${OBJ}engine.o
+	${CC} -o ${BIN}$@ $^ ${LDFLAGS} -ldl -rdynamic
+
+# Règle pour compiler le programme
+${OBJ}backgammon.o: ${SRC}backgammon.c
+	${CC} -o $@ -c $^ ${CFLAGS}
+
+# Règle pour compiler le moteur de jeu
+${OBJ}engine.o: ${SRC}engine.c
+	${CC} -o $@ -c $^ ${CFLAGS}
+
+# Règle pour compiler l'UI
+${OBJ}display.o: ${SRC}display.c
+	${CC} -o $@ -c $^ ${CFLAGS}
+
+
+# Compilation lib ai
 libai:
-	@echo "Compilation de l'IA"
-	${CC} -fPIC -o ${LIB}game_ai.o -c ${LIB}game_ai.c
-	${CC} -shared -o ${LIB}libgame_ai.so.1 ${LIB}game_ai.o -I${INC}
+	${CC} -fPIC -o ${LIB}${LIBNAME}.o -c ${LIB}${LIBNAME}.c -I${INC}
+	${CC} -shared -o ${LIB}lib${LIBNAME}.so ${LIB}${LIBNAME}.o
 
+# Nettoyage du projet
 clean:
-	@echo "Nettoyage du projet"
 	rm ${OBJ}*.o
-
-mrproper:
-	@echo "Nettoyage de l'executable"
+	rm ${LIB}*.o
+	
+	
+# Nettoyage du projet + rm de l'exe
+mrproper: clean
+	rm ${LIB}lib${LIBNAME}.so
 	rm ${BIN}${EXEC}
 
 # Fin
-

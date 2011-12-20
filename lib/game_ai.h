@@ -1,69 +1,65 @@
 #ifndef __GAME_AI_H__
 #define __GAME_AI_H__
 
-/**
- * Prise de décision de la part de l'IA
- * @param const game_t
- *	l'état du jeu courant
- * @param const player_t
- *	joueur actif à faire jouer
- * @param const moves_order_t*
- *	pointeur vers les mouvements à effectuer par l'IA
- * @return int
- *	code de retour défini par des constantes
- */
-int make_decision(const game_t, const player_t, const moves_order_t*);
+#include "../include/backgammon.h"
 
 /**
- * Doubler la mise
- * @param const game_t
- *	l'état du jeu courant
- * @param const player_t
- *	joueur actif qui demande la mise
- * @return int
- *	true si on propose de doubler
- * 	false sinon
+ * Initialiser la librairie
+ * @param char name[50]
+ *	nom associé à la librairie
  */
-bool double_stake(const game_t, const player_t);
-
-/**
- * Accepter ou refuser la nouvelle mise
- * @param const game_t
- *	l'état du jeu courant
- * @param const player_t
- *	joueur non actif à qui on demande la mise
- * @return int
- *	true si on accepte la nouvelle mise
- * 	false sinon
- */
-bool take_double(const game_t, const player_t);
-
+void InitLibrary(char name[50]);
 
 /**
  * Initialiser l'IA pour un match
  * @param const unsigned int target_score
  *	score cible pour gagner un match
- * @return void
  */
-void start_match(const unsigned int target_score);
+void StartMatch(const unsigned int target_score);
 
 /**
- * Initialiser l'IA pour une partie (d'un match)
- * @return void
+ * Initialiser l'IA pour une manche (d'un match)
  */
-void start_game();
+void StartGame();
 
 /**
- * Terminer une partie (d'un match)
- * @return void
+ * Fin d'une manche (d'un match)
  */
-void end_game();
+void EndGame();
 
 /**
- * Terminer un match
- * @return void
+ * Fin d'un match
  */
-void end_match();
+void EndMatch();
+
+/**
+ * Doubler la mise
+ * @param const SGameState * const gameState
+ *	l'état du jeu courant
+ * @return int
+ *	vrai si on propose de doubler : faux sinon
+ */
+int DoubleStack(const SGameState * const gameState);
+
+/**
+ * Accepter ou refuser la nouvelle mise
+ * @param const SGameState * const gameState
+ *	l'état du jeu courant
+ * @return int
+ *	vrai si on accepte la nouvelle mise ; faux sinon
+ */
+int TakeDouble(const SGameState * const gameState);
+
+/**
+ * Prise de décision de la part de l'IA
+ * @param const SGameState * const gameState
+ *	l'état du jeu courant
+ * @param SMove moves[4]
+ *	tableau des mouvements à effectuer par l'IA
+ * @param unsigned int lastTimeError
+ *	vrai si la dernière action a causée une erreur
+ */
+void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned int lastTimeError);
 
 #endif
 

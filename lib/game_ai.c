@@ -1,41 +1,31 @@
+// Includes standards
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "../include/game_engine.h"
+// Includes persos
+#include "../include/backgammon.h"
 #include "game_ai.h"
 
-int make_decision(const game_t game, const player_t player, const moves_order_t* moves)
+void InitLibrary(char name[50]){}
+
+void StartMatch(const unsigned int target_score){}
+
+void StartGame(){}
+
+void EndGame(){}
+
+void EndMatch(){}
+
+
+int DoubleStack(const SGameState * const gameState)
 {
-	return AI_SUCCESS;
+	return 0;
 }
 
-bool double_stake(const game_t game, const player_t player)
+int TakeDouble(const SGameState * const gameState)
 {
-	return true;
+	return 0;
 }
 
-bool take_double(const game_t game, const player_t player)
-{
-	return true;
-}
-
-void start_match(const unsigned int target_score)
-{
-	printf("Début du match !\n");
-}
-
-void start_game(void)
-{
-
-}
-
-void end_game(void)
-{
-
-}
-
-void end_match(void)
-{
-
-}
+void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned int lastTimeError){}
 

@@ -1,9 +1,11 @@
+// Includes standards
 #include <stdlib.h>
 #include <stdio.h>
-#include <SDL/SDL.h>
 #include <string.h>
+// Includes SDL
+#include <SDL/SDL.h>
 #include <SDL/SDL_rotozoom.h>
-
+// Includes persos
 #include "../include/backgammon.h"
 #include "../include/display.h"
 
