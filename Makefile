@@ -8,7 +8,7 @@ CC=gcc
 CFLAGS=-W -Wall -std=c99
 LDFLAGS=-lSDL -lSDL_image -lSDL_ttf -lSDL_gfx
 EXEC=backgammon
-LIBNAME=game_ai
+LIBNAME=ai
 
 # Path
 OBJ=obj/

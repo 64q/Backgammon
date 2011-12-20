@@ -9,7 +9,7 @@
 // Includes persos
 #include "../include/engine.h"
 #include "../include/display.h"
-#include "../lib/game_ai.h"
+#include "../lib/ai.h"
 
 int main(int argc, char *argv[])
 {
