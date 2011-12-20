@@ -4,9 +4,8 @@ Projet de backgammon dans le cadre du projet de langage procédural C.
 
 1. Instructions de compilation
 =====================================
-- `make libai' pour compiler la librairie de l'IA.
-- `make game_engine' pour compiler le moteur de jeu.
-- `make all' pour compiler le jeu.
+- `make libai` pour compiler la librairie de l'IA.
+- `make all` pour compiler le jeu.
 
 2. Conventions de codage
 =====================================
