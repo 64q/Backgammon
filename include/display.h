@@ -1,38 +1,39 @@
-#ifndef AFFICHAGE_H
-#define AFFICHAGE_H
+#ifndef __DISPLAY_H__
+#define __DISPLAY_H__
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include "backgammon.h"
 
 #define WINDOW 1
 #define FULL_SCREEN 2
+#define WIN_NAME "Backgammon"
 
 typedef struct display_manager
 {
 	//contiendra le contenu de la fenetre
     SDL_Surface *screen;
-	
+
 	//les différentes images qui vont être utilisées
     SDL_Surface *background;
     SDL_Surface *black;
     SDL_Surface *white;
-	
+
 	//la position du fond (0,0)
     SDL_Rect background_position;
-	
+
 	//la résolution max de l'écran (res_max[0]=largeur; res_max[1]=hauteur)
     int res_max[2];
-	
+
 	//le chemin d'accèes des images
     char *path_img;
-	
+
 	//le mode d'affichage (WINDOW ou FULL_SCREEN)
 	int display_mode;
-	
+
 	//la largeur du mode fenetré par défaut
 	int window_mode_width;
 
-}display_manager;
+} display_manager;
 
 
 //initialise la structure d'affichage et ouvre la fenetre
@@ -40,7 +41,7 @@ typedef struct display_manager
 void init_display(display_manager* d_manager ,char* path_img);
 
 //affiche les pions
-void checker_display(display_manager*, SGameState*  );
+void checker_display(display_manager*, SGameState*);
 
 //affiche l'interface
 void interface_display(display_manager*);
@@ -55,3 +56,4 @@ void switch_to_full_screen(display_manager*);
 void switch_to_window(display_manager*);
 
 #endif
+
