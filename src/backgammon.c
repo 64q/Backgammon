@@ -16,27 +16,48 @@ int main(int argc, char *argv[])
 	void *lib;
 	
 	// Vérification des args de la ligne de commande
-	if (argc < 2) {
+	if (argc < 1) {
 		fprintf(stderr, "usage: %s <lib_path>\n", *(argv));
-		exit(1);
+		//exit(1);
 	}
 	
 	// Ouverture dynamique de la bibliothèque
 	if ((lib = dlopen(*(argv + 1), RTLD_LAZY)) == NULL)
 	{
 		fprintf(stderr, "Error: %s\n", dlerror());
-		exit(1);
+		//exit(1);
 	}
+	int fps = 60;
+	int delay = 1000/fps;
 	
 	display_manager d_manager;
 	
     init_display(&d_manager, "./img/defaut/");
+	
+	SGameState g_state;
+	init_game(&g_state);
+	
+	player_infos p_infos;
+	init_player(&p_infos, "Erwan", HUMAN, "Ordi", IA);
+	
+	//TEST
+	g_state.score = 3;
+	g_state.scoreP2 = 2;
+	g_state.zones[EPos_BarP1].nb_checkers=3;
+	g_state.zones[EPos_BarP2].nb_checkers=4;
+	g_state.die1 = 3;
+	g_state.die2 = 5;
+	
+	
     int continuer = 1;
     SDL_Event event;
-
+	
+	
     while (continuer)
     {
-    	interface_display(&d_manager);
+    	interface_display(&d_manager, &g_state, &p_infos);
+		
+		
 		
         SDL_PollEvent(&event);
         Uint8 *keystates = SDL_GetKeyState( NULL );
@@ -59,12 +80,14 @@ int main(int argc, char *argv[])
 
             	
         }
-
+		
+		SDL_Delay(delay);
         SDL_Flip(d_manager.screen);
     }
 
     free_surface(&d_manager);
-
+	
+	TTF_Quit();
     SDL_Quit();
 
     return EXIT_SUCCESS;
