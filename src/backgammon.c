@@ -16,12 +16,10 @@ int main(int argc, char *argv[])
 	void *lib;
 
 	// Vérification des args de la ligne de commande
-<<<<<<< HEAD
-	if (argc < 1) {
-=======
+
+
 	if (argc < 2)
 	{
->>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 		fprintf(stderr, "usage: %s <lib_path>\n", *(argv));
 		//exit(1);
 	}
@@ -32,13 +30,13 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Error: %s\n", dlerror());
 		//exit(1);
 	}
-<<<<<<< HEAD
+	
 	int fps = 60;
 	int delay = 1000/fps;
 	
 	display_manager d_manager;
 	
-    init_display(&d_manager, "./img/defaut/");
+    init_display(&d_manager, "./styles/default/");
 	
 	SGameState g_state;
 	init_game(&g_state);
@@ -55,11 +53,11 @@ int main(int argc, char *argv[])
 	g_state.die2 = 5;
 	
 	
-    int continuer = 1;
+    int run = 1;
     SDL_Event event;
 	
 	
-    while (continuer)
+    while (run)
     {
     	interface_display(&d_manager, &g_state, &p_infos);
 		
@@ -71,7 +69,7 @@ int main(int argc, char *argv[])
         switch(event.type)
         {
             case SDL_QUIT:
-                continuer = 0;
+                run = 0;
             case SDL_KEYDOWN:
             	
             	if( keystates[ SDLK_LEFT ] ) { 
@@ -81,7 +79,7 @@ int main(int argc, char *argv[])
 					 switch_to_window(&d_manager);
 				}
 				if( keystates[ SDLK_UP ] ) { 
-					continuer = 0;
+					run = 0;
 				}
 
             	
@@ -95,49 +93,6 @@ int main(int argc, char *argv[])
 	
 	TTF_Quit();
     SDL_Quit();
-=======
-
-	display_manager d_manager;
-
-	init_display(&d_manager, "./styles/default/");
-	int run = 1;
-	SDL_Event event;
-
-	while (run)
-	{
-	interface_display(&d_manager);
-
-	SDL_PollEvent(&event);
-	Uint8 *keystates = SDL_GetKeyState( NULL );
-
-	switch(event.type)
-	{
-		case SDL_QUIT:
-			run = 0;
-		break;
-		case SDL_KEYDOWN:
-			if (keystates[SDLK_LEFT])
-			{
-				switch_to_full_screen(&d_manager);
-			}
-			if (keystates[SDLK_RIGHT])
-			{
-				switch_to_window(&d_manager);
-			}
-			if (keystates[SDLK_UP])
-			{
-				run = 0;
-			}
-		break;
-	}
-
-	SDL_Flip(d_manager.screen);
-	}
->>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
-
-	free_surface(&d_manager);
-
-	SDL_Quit();
 
 	return EXIT_SUCCESS;
 }

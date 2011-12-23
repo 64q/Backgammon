@@ -55,7 +55,7 @@ typedef struct
 {
 	SZone zones[28];				// Tableau contenants les zones où les pions peuvent se trouver, indexés par des EPosition
 	unsigned int die1,die2;			// Les dés de jeu
-	unsigned int scoreP1, scoreP2;	// Les scores des joueurs
+	unsigned int score, scoreP2;	// Les scores des joueurs
 	unsigned int stake;				// Mise courante de la partie
 } SGameState;
 

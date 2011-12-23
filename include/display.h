@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-#ifndef AFFICHAGE_H
-#define AFFICHAGE_H
-
-=======
 #ifndef __DISPLAY_H__
 #define __DISPLAY_H__
->>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
+
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
@@ -21,17 +16,17 @@ typedef struct display_manager
 {
 	//contiendra le contenu de la fenetre
     SDL_Surface *screen;
-<<<<<<< HEAD
+
 	SDL_Surface *backBuffer;
 	
-=======
 
->>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
+
+
 	//les différentes images qui vont être utilisées
     SDL_Surface *background;
     SDL_Surface *black;
     SDL_Surface *white;
-<<<<<<< HEAD
+
 	SDL_Surface *black_out;
     SDL_Surface *white_out;
 	SDL_Surface *icone_ia;
@@ -44,9 +39,6 @@ typedef struct display_manager
 	//font
 	TTF_Font *font;
 	
-=======
-
->>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 	//la position du fond (0,0)
     SDL_Rect background_position;
 
@@ -72,15 +64,15 @@ typedef struct display_manager
 //path_img correspond au chemin d'accèes des imgages
 void init_display(display_manager* ,char*);
 
-<<<<<<< HEAD
+
 //affiche les pions (private)
 void checker_display(display_manager*, SGameState*  );
-=======
+
 //affiche les pions
 void checker_display(display_manager*, SGameState*);
->>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 
-//affiche les csores et autres informations (private)
+
+//affiche les scores et autres informations (private)
 void infos_display(display_manager*, SGameState*, player_infos* );
 
 //affiche l'interface fond + pion + score ...
