@@ -19,20 +19,24 @@ void init_display(display_manager* d_manager ,char* path_img)
 	//initialiser SDL
 	atexit(SDL_Quit);
 	SDL_Init(SDL_INIT_VIDEO);
+<<<<<<< HEAD
 	TTF_Init();
 	
 	
 	
+=======
+
+>>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 	//on récupère la résolution max de l'écran
 	d_manager->res_max[0] = SDL_GetVideoInfo()->current_w;
 	d_manager->res_max[1] = SDL_GetVideoInfo()->current_h;
-	
+
 	//choix de la taille du mode fenetre par défaut (en 16/9 donc on définit seulement la largeur)
 	d_manager->window_mode_width = 800;
 
 	//on enregistre le chemin des images pour plus tard
 	d_manager->path_img = (char*)malloc((strlen(path_img) + 1) * sizeof(char));
-	
+
 	//contiendra la chaîne concaténée
 	strcpy(d_manager->path_img, path_img);
 	char path_img_cp[100];
@@ -43,6 +47,7 @@ void init_display(display_manager* d_manager ,char* path_img)
 	strcpy(path_img_cp, path_img);
 	strcat(path_img_cp, "icone.png");
 	SDL_WM_SetIcon(IMG_Load(path_img_cp), NULL);
+<<<<<<< HEAD
 	
 	/* Chargement de la police */
 	strcpy(path_img_cp, path_img);
@@ -200,6 +205,32 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 		SDL_BlitSurface(d_manager->white, NULL, d_manager->backBuffer, &(checker_position));
 	}
 	
+=======
+
+
+
+	//fond
+	strcpy(path_img_cp, path_img);
+	strcat(path_img_cp, "background.png");
+	d_manager->background = IMG_Load(path_img_cp);
+
+	//pion noir
+	strcpy(path_img_cp, path_img);
+	strcat(path_img_cp, "noir.png");
+	d_manager->black = IMG_Load(path_img_cp);
+
+	//pion blanc
+	strcpy(path_img_cp, path_img);
+	strcat(path_img_cp, "blanc.png");
+	d_manager->white = IMG_Load(path_img_cp);
+
+	//initialisation de la fenêtre
+
+	switch_to_window(d_manager);
+	d_manager->display_mode = WINDOW;
+
+	SDL_WM_SetCaption(WIN_NAME, NULL);
+>>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 }
 
 void infos_display(display_manager* d_manager, SGameState* g_state, player_infos* p_infos)
@@ -265,6 +296,7 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 
 void dices_display(display_manager* d_manager, unsigned int val, int x, int y)
 {
+<<<<<<< HEAD
 	if(val < 7)
 	{
 		SDL_Rect pos;
@@ -282,6 +314,10 @@ void dices_display(display_manager* d_manager, unsigned int val, int x, int y)
 		SDL_BlitSurface(d_manager->dice, &sel_sprite, d_manager->backBuffer, &(pos));
 	}
 	
+=======
+	SDL_BlitSurface(d_manager->background, NULL, d_manager->screen, &(d_manager->background_position));
+
+>>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 }
 
 void free_surface(display_manager* d_manager)
@@ -296,12 +332,21 @@ void switch_to_full_screen(display_manager* d_manager)
 {
 	if(d_manager->display_mode != FULL_SCREEN)
 	{
+<<<<<<< HEAD
 		
 		
 		
 		d_manager->ratio = (double)d_manager->res_max[0]/(double)d_manager->background->w;
 		
 		
+=======
+		//on recharge les images qui ont été dégradé par le passage en mode fenêtré
+		char path_img_cp[100];
+		strcpy(path_img_cp, d_manager->path_img);
+		strcat(path_img_cp, "background.png");
+		d_manager->background = IMG_Load(path_img_cp);
+
+>>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 		d_manager->screen = SDL_SetVideoMode(d_manager->res_max[0], d_manager->res_max[1], 32, SDL_FULLSCREEN|SDL_DOUBLEBUF);
 		d_manager->display_mode = FULL_SCREEN;
 	}
@@ -311,17 +356,26 @@ void switch_to_window(display_manager* d_manager)
 {
 	if(d_manager->display_mode != WINDOW)
 	{
+<<<<<<< HEAD
 		
 		d_manager->ratio = (double)d_manager->window_mode_width/(double)d_manager->background->w;
 		
 		
 		
+=======
+
+		//on dézoom les images
+		double zoom = (double)d_manager->window_mode_width/(double)d_manager->background->w;
+		d_manager->background = zoomSurface(d_manager->background, zoom, zoom, 1);
+
+>>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd
 		//on passe en plein écran
 		d_manager->screen = SDL_SetVideoMode(d_manager->window_mode_width, d_manager->window_mode_width*9/16, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 		d_manager->display_mode = WINDOW;
 	}
 }
 
+<<<<<<< HEAD
 void load_images(display_manager* d_manager)
 {
 	
@@ -374,3 +428,5 @@ void load_images(display_manager* d_manager)
 
 
 
+=======
+>>>>>>> 934ef1a350dcd7a01c1a9b8b67c8c988c314b0cd

@@ -19,16 +19,16 @@ Ex: double une_petite_fonction(int ma_variable);
 Dans l'idéal, les fonctions doivent être nommées en anglais.
 
 - L'identation suit le schéma suivant :
-Ex: 
+Ex:
 double une_petite_fonction(int ma_variable)
 {
-  if (cond(ma_variable))
+	if (cond(ma_variable))
 	{
 		// traitement
 	}
 	else
 	{
-		// sinon	
+		// sinon
 	}
 }
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 			// i = 1 !
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -57,3 +57,4 @@ int main(int argc, char *argv[])
 =====================================
 Les codes doivent être commentés, clairement indentés. En cas de redondance de code
 des fonctions devront être définies pour factoriser le dit code.
+
