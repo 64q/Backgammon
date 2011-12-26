@@ -37,7 +37,7 @@ ${OBJ}display.o: ${SRC}display.c
 
 # Compilation lib ai
 libai:
-	${CC} -fPIC -o ${LIB}${LIBNAME}.o -c ${LIB}${LIBNAME}.c -I${INC}
+	${CC} -fPIC -o ${LIB}${LIBNAME}.o -c ${LIB}${LIBNAME}.c ${CFLAGS}
 	${CC} -shared -o ${LIB}lib${LIBNAME}.so ${LIB}${LIBNAME}.o
 
 # Nettoyage du projet
