@@ -20,9 +20,6 @@ void init_display(display_manager* d_manager ,char* path_img)
 	atexit(SDL_Quit);
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
-	
-	
-	
 
 	//on récupère la résolution max de l'écran
 	d_manager->res_max[0] = SDL_GetVideoInfo()->current_w;
@@ -54,9 +51,7 @@ void init_display(display_manager* d_manager ,char* path_img)
 	
 	//chargement des images
 	load_images(d_manager);
-	
-	
-	
+
 	//initialisation de la fenêtre
 	switch_to_window(d_manager);
 	
@@ -152,7 +147,6 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 		}
 		
 	}
-	
 	
 	//affichage de la partie haute droite
 	for(int i = 18; i < 24; i++)
@@ -268,7 +262,6 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 
 void dices_display(display_manager* d_manager, unsigned int val, int x, int y)
 {
-
 	if(val < 7)
 	{
 		SDL_Rect pos;
@@ -285,11 +278,8 @@ void dices_display(display_manager* d_manager, unsigned int val, int x, int y)
 		
 		SDL_BlitSurface(d_manager->dice, &sel_sprite, d_manager->backBuffer, &(pos));
 	}
-	
 
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->screen, &(d_manager->background_position));
-
-
 }
 
 void free_surface(display_manager* d_manager)
@@ -304,8 +294,6 @@ void switch_to_full_screen(display_manager* d_manager)
 {
 	if(d_manager->display_mode != FULL_SCREEN)
 	{
-
-		
 		d_manager->ratio = (double)d_manager->res_max[0]/(double)d_manager->background->w;
 
 		d_manager->screen = SDL_SetVideoMode(d_manager->res_max[0], d_manager->res_max[1], 32, SDL_FULLSCREEN|SDL_DOUBLEBUF);
@@ -319,9 +307,7 @@ void switch_to_window(display_manager* d_manager)
 	{
 		
 		d_manager->ratio = (double)d_manager->window_mode_width/(double)d_manager->background->w;
-		
-		
-		
+
 		//on passe en plein écran
 		d_manager->screen = SDL_SetVideoMode(d_manager->window_mode_width, d_manager->window_mode_width*9/16, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 		d_manager->display_mode = WINDOW;
@@ -339,13 +325,11 @@ void load_images(display_manager* d_manager)
 	strcat(path_img_cp, "background.png");
 	d_manager->background = IMG_Load(path_img_cp);
 	
-
 	//pion noir
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "black.png");
 	d_manager->black = IMG_Load(path_img_cp);
 	
-
 	//pion blanc
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "white.png");
@@ -362,7 +346,6 @@ void load_images(display_manager* d_manager)
 	strcat(path_img_cp, "white_out.png");
 	d_manager->white_out = IMG_Load(path_img_cp);
 	
-	
 	//icone des joueurs ia
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "ia.png");
@@ -377,8 +360,6 @@ void load_images(display_manager* d_manager)
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "dice.png");
 	d_manager->dice = IMG_Load(path_img_cp);
-	
-	
 }
 
 
