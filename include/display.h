@@ -19,9 +19,6 @@ typedef struct display_manager
 
 	SDL_Surface *backBuffer;
 	
-
-
-
 	//les différentes images qui vont être utilisées
     SDL_Surface *background;
     SDL_Surface *black;
@@ -33,8 +30,6 @@ typedef struct display_manager
 	SDL_Surface *icone_human;
 	
 	SDL_Surface *dice;
-	
-	
 	
 	//font
 	TTF_Font *font;
@@ -92,8 +87,6 @@ void switch_to_window(display_manager*);
 
 //charge toutes les images du jeu (private)
 void load_images(display_manager*);
-
-
 
 #endif
 

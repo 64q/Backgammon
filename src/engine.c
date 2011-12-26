@@ -1,10 +1,9 @@
+// Includes standards
 #include <string.h>
 #include <stdlib.h>
-
+// Includes persos
 #include "../include/backgammon.h"
 #include "../include/engine.h"
-
-
 
 void init_player(player_infos* p_infos, char *nameP1, int typeP1, char *nameP2, int typeP2)
 {
@@ -19,7 +18,6 @@ void init_player(player_infos* p_infos, char *nameP1, int typeP1, char *nameP2, 
 	
 	
 }
-
 
 void init_game(SGameState * game_state)
 {

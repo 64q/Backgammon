@@ -1,6 +1,5 @@
-
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef __ENGINE_H__
+#define __ENGINE_H__
 
 #include "backgammon.h"
 
@@ -15,7 +14,7 @@ typedef struct player_infos
 	char *nameP2;
 	int typeP2;
 
-}player_infos;
+} player_infos;
 
 //initialise la structure player_infos avec le nom de chaque joueur et son type (IA ou HUMAN)
 void init_player(player_infos*, char *nameP1, int typeP1, char *nameP2, int typeP2);
@@ -24,12 +23,3 @@ void init_player(player_infos*, char *nameP1, int typeP1, char *nameP2, int type
 void init_game(SGameState*);
 
 #endif
-
-#ifndef __ENGINE_H__
-#define __ENGINE_H__
-
-
-
-#endif
-
-
