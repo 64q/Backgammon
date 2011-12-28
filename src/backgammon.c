@@ -41,6 +41,11 @@ int main(int argc, char *argv[])
 
 	player_infos p_infos;
 	init_player(&p_infos, "Erwan", HUMAN, "Ordi", IA);
+	
+	list_messages l_messages;
+	l_messages.nb_messages = 0;
+	add_message(&l_messages, "salut" , 100, 200, 345, 345);
+	add_message(&l_messages, "ça roule" , 600, 300, 200, 700);
 
 	//TEST
 	g_state.score = 3;
@@ -54,10 +59,10 @@ int main(int argc, char *argv[])
 	int run = 1;
 	SDL_Event event;
 
-
+	
 	while (run)
 	{
-		interface_display(&d_manager, &g_state, &p_infos);
+		interface_display(&d_manager, &g_state, &p_infos, &l_messages);
 
 		SDL_PollEvent(&event);
 		Uint8 *keystates = SDL_GetKeyState( NULL );
@@ -82,7 +87,7 @@ int main(int argc, char *argv[])
 				}
 			break;
 		}
-
+		
 		SDL_Delay(delay);
 		SDL_Flip(d_manager.screen);
 	}

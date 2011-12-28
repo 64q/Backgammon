@@ -78,3 +78,21 @@ void init_game(SGameState * game_state)
 	game_state->zones[EPos_OutP2].nb_checkers=0;
 	game_state->zones[EPos_BarP2].nb_checkers=0;
 }
+
+
+
+void add_message(list_messages* list, char* text, int x, int y, int width, int height)
+{
+	
+	list->tab[list->nb_messages].text = (char*)malloc( sizeof(char) * strlen(text) );
+	strcpy(list->tab[list->nb_messages].text, text);
+	
+	list->tab[list->nb_messages].position.x = x;
+	list->tab[list->nb_messages].position.y = y;
+	list->tab[list->nb_messages].position.w = width;
+	list->tab[list->nb_messages].position.h = height;
+	
+	list->nb_messages ++;
+	
+}
+

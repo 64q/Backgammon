@@ -31,6 +31,8 @@ typedef struct display_manager
 	
 	SDL_Surface *dice;
 	
+	SDL_Surface *message_border;
+	
 	//font
 	TTF_Font *font;
 	
@@ -51,8 +53,12 @@ typedef struct display_manager
 	
 	//ratio entre les images (full hd) et la résoltion de la fenêtre
 	double ratio;
+	
+	
 
 } display_manager;
+
+
 
 
 //initialise la structure d'affichage et ouvre la fenetre
@@ -71,10 +77,12 @@ void checker_display(display_manager*, SGameState*);
 void infos_display(display_manager*, SGameState*, player_infos* );
 
 //affiche l'interface fond + pion + score ...
-void interface_display(display_manager*, SGameState*, player_infos*);
+void interface_display(display_manager*, SGameState*, player_infos*, list_messages*);
 
 //affiche les dés dans leur zones 
-void dices_display(display_manager* d_manager, unsigned int val, int x, int y);
+void die_display(display_manager* d_manager, unsigned int val, int x, int y);
+
+void messages_display(display_manager *d_manager, list_messages* l_messages);
 
 //libère les SDL_Surface
 void free_surface(display_manager*);
