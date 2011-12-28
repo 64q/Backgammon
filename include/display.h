@@ -32,6 +32,7 @@ typedef struct display_manager
 	SDL_Surface *dice;
 	
 	SDL_Surface *message_border;
+	SDL_Surface *message_border_clicked;
 	
 	//font
 	TTF_Font *font;

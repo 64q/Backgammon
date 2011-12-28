@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <SDL/SDL_ttf.h>
-
+#include <stdbool.h>
 // Includes persos
 #include "../include/backgammon.h"
 #include "../include/engine.h"
@@ -83,26 +83,25 @@ void init_game(SGameState * game_state)
 
 
 
-void add_message(TTF_Font * font, list_messages* list, char* text, int x, int y, int width, int height)
+void add_message(TTF_Font * font, list_messages* list, char* text, int x, int y, int width, int height, ptr_fct_message function)
 {
 	SDL_Color noir;
 	noir.r = 0; 
 	noir.g = 0;
 	noir.b = 0;
 	
-	char* t = (char*)malloc(sizeof(char)*300);
-	strcpy(t, text);
+	char* tmp = (char*)malloc(sizeof(char)*200);
+	strcpy(tmp, text);
+	
+	char * pch = (char*)malloc(sizeof(char)*200);
+	
+	pch = strtok (tmp,"\n");
 	int i = 0;
-	char * pch = (char*)malloc(sizeof(char)*300);
-	
-	pch = strtok (t,"\n");
-	
 	while (pch != NULL)
 	{	
 		
-		list->tab[list->nb_messages].lines[i] = TTF_RenderUTF8_Solid(font, pch, noir);
-		
-		printf ("%s\n",pch);
+		list->tab[list->nb_messages].lines[i] = TTF_RenderUTF8_Blended(font, pch, noir);
+
 		pch = strtok (NULL, "\n");
 		i++;
 	}
@@ -113,8 +112,61 @@ void add_message(TTF_Font * font, list_messages* list, char* text, int x, int y,
 	list->tab[list->nb_messages].position.y = y;
 	list->tab[list->nb_messages].position.w = width;
 	list->tab[list->nb_messages].position.h = height;
+	list->tab[list->nb_messages].is_clicked = false;
+	list->tab[list->nb_messages].function = function;
 	
 	list->nb_messages ++;
 	
 }
 
+void on_click_listener(list_messages* list, double ratio)
+{
+	int x, y;
+	SDL_GetMouseState(&x, &y); 
+	x /= ratio;
+	y /= ratio;
+	
+	for(int i =0; i < list->nb_messages; i++)
+	{
+		if( x > list->tab[i].position.x && x < list->tab[i].position.x + list->tab[i].position.w 
+			&& y > list->tab[i].position.y && y < list->tab[i].position.y + list->tab[i].position.h)
+		{
+			list->tab[i].is_clicked = true;
+		}else
+		{
+			list->tab[i].is_clicked = false;
+		}
+		
+	}
+	
+	
+}
+void on_unclick_listener(list_messages* list, double ratio)
+{
+	int x, y;
+	SDL_GetMouseState(&x, &y); 
+	x /= ratio;
+	y /= ratio;
+	for(int i =0; i < list->nb_messages; i++)
+	{
+		if(list->tab[i].is_clicked)
+		{
+			list->tab[i].is_clicked = false;
+			if( x > list->tab[i].position.x && x < list->tab[i].position.x + list->tab[i].position.w 
+			&& y > list->tab[i].position.y && y < list->tab[i].position.y + list->tab[i].position.h)
+			{
+				list->tab[i].function();
+			}
+		}
+	}
+}
+
+void throw_dice()
+{
+	printf("Eh oh minutes!! ça va venir!\n");
+}
+
+void shutdown()
+{
+	exit(0);
+}

@@ -293,11 +293,23 @@ void die_display(display_manager* d_manager, unsigned int val, int x, int y)
 
 void messages_display(display_manager *d_manager, list_messages* l_messages)
 {
+	SDL_Surface *border;
+	
 	SDL_Rect sel_sprite;
 	SDL_Rect position;
 	
 	for(int i = 0; i < l_messages->nb_messages; i++)
 	{
+		if(l_messages->tab[i].is_clicked)
+		{
+			border = d_manager->message_border_clicked;
+			
+		}else
+		{
+			border = d_manager->message_border;
+			
+		}
+		
 		//affichage du coin haut gauche
 		sel_sprite.x = 0;
 		sel_sprite.y = 0;
@@ -306,7 +318,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		position.x = l_messages->tab[i].position.x;
 		position.y = l_messages->tab[i].position.y;
 		
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du coin haut droit
 		sel_sprite.x = 72;
@@ -314,7 +326,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.w = 30;
 		sel_sprite.h = 30;
 		position.x = l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du coin bas gauche
 		sel_sprite.x = 0;
@@ -323,7 +335,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.h = 30;
 		position.x = l_messages->tab[i].position.x;
 		position.y = l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du coin bas droit
 		sel_sprite.x = 72;
@@ -332,7 +344,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.h = 30;
 		position.x = l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30;
 		position.y = l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage de la bordure haute
 		sel_sprite.x = 31;
@@ -347,12 +359,12 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		while( position.x + 40 <= l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30 ) 
 		{
 			
-			SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.x += 40;
 		}	
 		//on affiche ce qui reste pour finir la bordure
 		sel_sprite.w = (l_messages->tab[i].position.w - 60) % 40;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
 		//affichage de la bordure basse (idem bodure haute)
@@ -365,12 +377,12 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		while( position.x + 40 <= l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30 )
 		{
 			
-			SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.x += 40;
 			
 		}	
 		sel_sprite.w = (l_messages->tab[i].position.w - 60) % 40;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
 		//affichage de la bordure gauche (idem bodure haute)
@@ -383,12 +395,12 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		while( position.y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30 )
 		{
 			
-			SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.y += 40;
 			
 		}	
 		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
 		//affichage de la bordure droite (idem bodure haute)
@@ -401,12 +413,12 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		while( position.y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30 )
 		{
 			
-			SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.y += 40;
 			
 		}	
 		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du fond
 		sel_sprite.x = 31;
@@ -421,12 +433,12 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		{
 			while( position. y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30)
 			{
-				SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+				SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 				position.y += 40;
 				
 			}
 			sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
-			SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			sel_sprite.h = 40;
 			position.y = l_messages->tab[i].position.y + 30;
 			position.x += 40;
@@ -438,13 +450,13 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		while( position. y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30)
 		{
 			sel_sprite.w = (l_messages->tab[i].position.w - 60) % 40;
-			SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.y += 40;
 		}
 		
 		//on remplit le dernier coin en bas à droite
 		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
-		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
+		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
 		position.x = l_messages->tab[i].position.x+40;
@@ -472,6 +484,7 @@ void free_surface(display_manager* d_manager)
 	SDL_FreeSurface(d_manager->icone_human);
     SDL_FreeSurface(d_manager->dice);
 	SDL_FreeSurface(d_manager->message_border);
+	SDL_FreeSurface(d_manager->message_border_clicked);
 	
 }
 
@@ -550,6 +563,11 @@ void load_images(display_manager* d_manager)
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "message_border.png");
 	d_manager->message_border = IMG_Load(path_img_cp);
+	
+	//sprite des dés
+	strcpy(path_img_cp, d_manager->path_img);
+	strcat(path_img_cp, "message_border_clicked.png");
+	d_manager->message_border_clicked = IMG_Load(path_img_cp);
 }
 
 

@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
 	list_messages l_messages;
 	l_messages.nb_messages = 0;
 	
-	add_message(d_manager.font, &l_messages, " Lancer \n les dés   " , 100, 200, 345, 345);
-	
+	add_message(d_manager.font, &l_messages, "   Jouer!   " , 860, 455, 400, 170, throw_dice);
+	add_message(d_manager.font, &l_messages, "Quitter " , 1550, 900, 330, 170, shutdown);
 
 	//TEST
 // 	g_state.score = 3;
@@ -65,28 +65,39 @@ int main(int argc, char *argv[])
 	{
 		interface_display(&d_manager, &g_state, &p_infos, &l_messages);
 
-		SDL_PollEvent(&event);
+		
 		Uint8 *keystates = SDL_GetKeyState( NULL );
-
-		switch(event.type)
+		while (SDL_PollEvent(&event))
 		{
-			case SDL_QUIT:
-				run = 0;
-			break;
-			case SDL_KEYDOWN:
-				if (keystates[SDLK_LEFT]) 
-				{ 
-					switch_to_full_screen(&d_manager);
-				}
-				if (keystates[SDLK_RIGHT]) 
-				{ 
-					switch_to_window(&d_manager);
-				}
-				if (keystates[SDLK_UP]) 
-				{ 
+			switch(event.type)
+			{
+				printf("u\n");
+				case SDL_QUIT:
 					run = 0;
-				}
-			break;
+					break;
+				case SDL_KEYDOWN:
+					if (keystates[SDLK_LEFT]) 
+					{ 
+						switch_to_full_screen(&d_manager);
+					}
+					if (keystates[SDLK_RIGHT]) 
+					{ 
+						switch_to_window(&d_manager);
+					}
+					if (keystates[SDLK_UP]) 
+					{ 
+						run = 0;
+					}
+					
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					on_click_listener(&l_messages, d_manager.ratio);
+					break;
+				case SDL_MOUSEBUTTONUP:
+					on_unclick_listener(&l_messages, d_manager.ratio);
+					
+					break;
+			}
 		}
 		
 		SDL_Delay(delay);
