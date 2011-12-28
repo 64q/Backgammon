@@ -1,6 +1,8 @@
 // Includes standards
 #include <string.h>
 #include <stdlib.h>
+#include <SDL/SDL_ttf.h>
+
 // Includes persos
 #include "../include/backgammon.h"
 #include "../include/engine.h"
@@ -24,7 +26,7 @@ void init_game(SGameState * game_state)
 	game_state->score = 0;
 	game_state->scoreP2 = 0;
 	game_state->stake = 0;
-	
+	 
 	//on considère que le joueur 1 est le joueur qui joue dans le sens des aiguilles d'une montre (pour l'affichage)
 	game_state->zones[EPos_1].player = EPlayer1;
 	game_state->zones[EPos_1].nb_checkers = 2;
@@ -81,11 +83,31 @@ void init_game(SGameState * game_state)
 
 
 
-void add_message(list_messages* list, char* text, int x, int y, int width, int height)
+void add_message(TTF_Font * font, list_messages* list, char* text, int x, int y, int width, int height)
 {
+	SDL_Color noir;
+	noir.r = 0; 
+	noir.g = 0;
+	noir.b = 0;
 	
-	list->tab[list->nb_messages].text = (char*)malloc( sizeof(char) * strlen(text) );
-	strcpy(list->tab[list->nb_messages].text, text);
+	char* t = (char*)malloc(sizeof(char)*300);
+	strcpy(t, text);
+	int i = 0;
+	char * pch = (char*)malloc(sizeof(char)*300);
+	
+	pch = strtok (t,"\n");
+	
+	while (pch != NULL)
+	{	
+		
+		list->tab[list->nb_messages].lines[i] = TTF_RenderUTF8_Solid(font, pch, noir);
+		
+		printf ("%s\n",pch);
+		pch = strtok (NULL, "\n");
+		i++;
+	}
+	
+	list->tab[list->nb_messages].nb_lines = i;
 	
 	list->tab[list->nb_messages].position.x = x;
 	list->tab[list->nb_messages].position.y = y;

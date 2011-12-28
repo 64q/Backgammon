@@ -1,4 +1,4 @@
-// Includes standards
+﻿// Includes standards
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -37,23 +37,24 @@ int main(int argc, char *argv[])
 	init_display(&d_manager, "./styles/default/");
 
 	SGameState g_state;
-	init_game(&g_state);
+	init_game(&g_state); 
 
 	player_infos p_infos;
 	init_player(&p_infos, "Erwan", HUMAN, "Ordi", IA);
 	
 	list_messages l_messages;
 	l_messages.nb_messages = 0;
-	add_message(&l_messages, "salut" , 100, 200, 345, 345);
-	add_message(&l_messages, "ça roule" , 600, 300, 200, 700);
+	
+	add_message(d_manager.font, &l_messages, " Lancer \n les dés   " , 100, 200, 345, 345);
+	
 
 	//TEST
-	g_state.score = 3;
-	g_state.scoreP2 = 2;
-	g_state.zones[EPos_BarP1].nb_checkers=3;
-	g_state.zones[EPos_BarP2].nb_checkers=4;
-	g_state.die1 = 3;
-	g_state.die2 = 5;
+// 	g_state.score = 3;
+// 	g_state.scoreP2 = 2;
+// 	g_state.zones[EPos_BarP1].nb_checkers=3;
+// 	g_state.zones[EPos_BarP2].nb_checkers=4;
+// 	g_state.die1 = 3;
+// 	g_state.die2 = 5;
 
 
 	int run = 1;

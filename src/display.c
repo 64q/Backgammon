@@ -47,7 +47,7 @@ void init_display(display_manager* d_manager ,char* path_img)
 	/* Chargement de la police */
 	strcpy(path_img_cp, path_img);
 	strcat(path_img_cp, "font.ttf");
-    d_manager->font = TTF_OpenFont(path_img_cp, 80);
+    d_manager->font = TTF_OpenFont(path_img_cp, 70);
     
 	
 	//chargement des images
@@ -77,8 +77,11 @@ void interface_display(display_manager* d_manager, SGameState* g_state, player_i
 	//nom + score
 	infos_display(d_manager, g_state, p_infos);
 	//dés
-	die_display(d_manager, g_state->die1, 1515, 475);
-	die_display(d_manager, g_state->die2, 1615, 475);
+	if(g_state->die1 > 0 && g_state->die1 < 7 && g_state->die2 > 0 && g_state->die2 < 7)
+	{
+		die_display(d_manager, g_state->die1, 1515, 475);
+		die_display(d_manager, g_state->die2, 1615, 475);
+	}
 	
 	//messages
 	messages_display(d_manager, l_messages);
@@ -229,12 +232,12 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 	
 	/* Ecriture du nom et du score du P1 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
-	position.y= 40+5;
+	position.y= 40;
     texte = TTF_RenderText_Blended(d_manager->font, p_infos->nameP1, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
-	position.x= 1515+5;
-	position.y= 125+5;
+	position.x= 1515+20;
+	position.y= 125;
 	sprintf(score_string, "%i", g_state->score);
     texte = TTF_RenderText_Blended(d_manager->font, score_string, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
@@ -255,12 +258,12 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 	
 	/* Ecriture du nom et du score du P2 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
-	position.y= 755+5;
+	position.y= 755;
     texte = TTF_RenderText_Blended(d_manager->font, p_infos->nameP2, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
-	position.x= 1515+5;
-	position.y= 840+5;
+	position.x= 1515+20;
+	position.y= 840;
 	sprintf(score_string, "%i", g_state->scoreP2);
     texte = TTF_RenderText_Blended(d_manager->font, score_string, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
@@ -405,7 +408,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
 		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
 		
-		//affichage de la bordure haute
+		//affichage du fond
 		sel_sprite.x = 31;
 		sel_sprite.y = 31;
 		sel_sprite.w = 40;
@@ -430,6 +433,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 			
 		}
 		
+		//on finit de remplir la partie droite
 		position.y = l_messages->tab[i].position.y + 30;
 		while( position. y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30)
 		{
@@ -438,9 +442,19 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 			position.y += 40;
 		}
 		
+		//on remplit le dernier coin en bas à droite
 		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
 		SDL_BlitSurface(d_manager->message_border, &sel_sprite, d_manager->backBuffer, &(position));
 		
+		
+		position.x = l_messages->tab[i].position.x+40;
+		position.y = l_messages->tab[i].position.y+40;
+		
+		for(int j = 0; j < l_messages->tab[i].nb_lines; j++)
+		{
+			SDL_BlitSurface(l_messages->tab[i].lines[j], NULL, d_manager->backBuffer, &(position));
+			position.y += 60;
+		}
 		
 	}
 }

@@ -2,6 +2,7 @@
 #define __ENGINE_H__
 
 #include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 #include "backgammon.h"
 
 
@@ -11,17 +12,19 @@
 typedef struct player_infos
 {
 	char *nameP1;
-	int typeP1;
+	int typeP1; 
 	
 	char *nameP2;
 	int typeP2;
 
-} player_infos;
+}player_infos;
 
 typedef struct message
 {
-	char *text;
+	SDL_Surface *lines[10];
+	int nb_lines;
 	SDL_Rect position;
+	int *t[5];
 	
 }message;
 
@@ -39,6 +42,6 @@ void init_player(player_infos*, char *nameP1, int typeP1, char *nameP2, int type
 //initialise l'état du jeu au départ
 void init_game(SGameState*);
 
-void add_message(list_messages*, char* , int x, int y, int width, int height);
+void add_message(TTF_Font * font, list_messages*, char* , int x, int y, int width, int height);
 
 #endif
