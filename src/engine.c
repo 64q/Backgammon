@@ -7,19 +7,25 @@
 #include "../include/backgammon.h"
 #include "../include/engine.h"
 
-void init_player(player_infos* p_infos, char *nameP1, int typeP1, char *nameP2, int typeP2)
+void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, int typeP2)
 {
-	p_infos->nameP1 = (char*)malloc(50 * sizeof(char) );
-	strcpy(p_infos->nameP1, nameP1);
+	e_state->nameP1 = (char*)malloc(50 * sizeof(char) );
+	strcpy(e_state->nameP1, nameP1);
 	
-	p_infos->nameP2 = (char*)malloc(50 * sizeof(char) );
-	strcpy(p_infos->nameP2, nameP2);
+	e_state->nameP2 = (char*)malloc(50 * sizeof(char) );
+	strcpy(e_state->nameP2, nameP2);
 	
-	p_infos->typeP1 = typeP1;
-	p_infos->typeP2 = typeP2;
+	e_state->typeP1 = typeP1;
+	e_state->typeP2 = typeP2;
 	
+	e_state->nb_messages = 0;
 	
+	e_state->run = true;
+	
+	init_game( &(e_state->g_state) );
 }
+
+
 
 void init_game(SGameState * game_state)
 {
@@ -83,7 +89,7 @@ void init_game(SGameState * game_state)
 
 
 
-void add_message(TTF_Font * font, list_messages* list, char* text, int x, int y, int width, int height, ptr_fct_message function)
+void add_message(engine_state* e_state,TTF_Font *font, char* text, int x, int y, int width, int height, ptr_fct_message function)
 {
 	SDL_Color noir;
 	noir.r = 0; 
@@ -100,73 +106,81 @@ void add_message(TTF_Font * font, list_messages* list, char* text, int x, int y,
 	while (pch != NULL)
 	{	
 		
-		list->tab[list->nb_messages].lines[i] = TTF_RenderUTF8_Blended(font, pch, noir);
+		e_state->tab[e_state->nb_messages].lines[i] = TTF_RenderUTF8_Blended(font, pch, noir);
 
 		pch = strtok (NULL, "\n");
 		i++;
 	}
 	
-	list->tab[list->nb_messages].nb_lines = i;
+	e_state->tab[e_state->nb_messages].nb_lines = i;
 	
-	list->tab[list->nb_messages].position.x = x;
-	list->tab[list->nb_messages].position.y = y;
-	list->tab[list->nb_messages].position.w = width;
-	list->tab[list->nb_messages].position.h = height;
-	list->tab[list->nb_messages].is_clicked = false;
-	list->tab[list->nb_messages].function = function;
+	e_state->tab[e_state->nb_messages].position.x = x;
+	e_state->tab[e_state->nb_messages].position.y = y;
+	e_state->tab[e_state->nb_messages].position.w = width;
+	e_state->tab[e_state->nb_messages].position.h = height;
+	e_state->tab[e_state->nb_messages].is_clicked = false;
+	e_state->function[e_state->nb_messages] = function;
 	
-	list->nb_messages ++;
+	e_state->nb_messages ++;
 	
+	free(tmp);
+	free(pch);
 }
 
-void on_click_listener(list_messages* list, double ratio)
+void on_click_listener(engine_state* e_state, double ratio)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y); 
 	x /= ratio;
 	y /= ratio;
 	
-	for(int i =0; i < list->nb_messages; i++)
+	for(int i =0; i < e_state->nb_messages; i++)
 	{
-		if( x > list->tab[i].position.x && x < list->tab[i].position.x + list->tab[i].position.w 
-			&& y > list->tab[i].position.y && y < list->tab[i].position.y + list->tab[i].position.h)
+		if( x > e_state->tab[i].position.x && x < e_state->tab[i].position.x + e_state->tab[i].position.w 
+			&& y > e_state->tab[i].position.y && y < e_state->tab[i].position.y + e_state->tab[i].position.h)
 		{
-			list->tab[i].is_clicked = true;
+			e_state->tab[i].is_clicked = true;
 		}else
 		{
-			list->tab[i].is_clicked = false;
+			e_state->tab[i].is_clicked = false;
 		}
 		
 	}
 	
 	
 }
-void on_unclick_listener(list_messages* list, double ratio)
+void on_unclick_listener(engine_state* e_state, double ratio)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y); 
 	x /= ratio;
 	y /= ratio;
-	for(int i =0; i < list->nb_messages; i++)
+	for(int i =0; i < e_state->nb_messages; i++)
 	{
-		if(list->tab[i].is_clicked)
+		if(e_state->function[i] != NULL && e_state->tab[i].is_clicked)
 		{
-			list->tab[i].is_clicked = false;
-			if( x > list->tab[i].position.x && x < list->tab[i].position.x + list->tab[i].position.w 
-			&& y > list->tab[i].position.y && y < list->tab[i].position.y + list->tab[i].position.h)
+			e_state->tab[i].is_clicked = false;
+			if( x > e_state->tab[i].position.x && x < e_state->tab[i].position.x + e_state->tab[i].position.w 
+			&& y > e_state->tab[i].position.y && y < e_state->tab[i].position.y + e_state->tab[i].position.h)
 			{
-				list->tab[i].function();
+				e_state->function[i](e_state);
 			}
 		}
 	}
 }
 
-void throw_dice()
+void erase_messages(engine_state* e_state)
+{
+	e_state->nb_messages = 0;
+	
+}
+
+void throw_dice(engine_state* e_state)
 {
 	printf("Eh oh minutes!! ça va venir!\n");
 }
 
-void shutdown()
+void shutdown(engine_state* e_state)
 {
-	exit(0);
+	e_state->run = false;
 }

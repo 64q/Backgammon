@@ -1,19 +1,19 @@
 #ifndef __BKGM_H__
 #define __BKGM_H__
 
-/////////// Strutures à utiliser
+/////////// Strutures  utiliser
 
-// Représente un joueur
+// Reprsente un joueur
 typedef enum
 {
-	EPlayer1,	// Joueur 1 -> le joueur courant pour la stratégie
+	EPlayer1,	// Joueur 1 -> le joueur courant pour la stratgie
 	EPlayer2,	// Joueur 2
 } EPlayer;
 
-// Structure de représentation d'une zone du jeu
+// Structure de reprsentation d'une zone du jeu
 typedef struct
 {
-	EPlayer player;				// Joueur propriétaire des pions
+	EPlayer player;				// Joueur propritaire des pions
 	unsigned int nb_checkers;	// Nombre de pion du joueur sur la zone
 } SZone;
 
@@ -50,23 +50,23 @@ typedef enum
 	EPos_BarP2
 } EPosition;
 
-// Structure de représentation du jeu avec son plateau et les dés
+// Structure de reprsentation du jeu avec son plateau et les ds
 typedef struct
 {
-	SZone zones[28];				// Tableau contenants les zones où les pions peuvent se trouver, indexés par des EPosition
-	unsigned int die1,die2;			// Les dés de jeu
+	SZone zones[28];				// Tableau contenants les zones o les pions peuvent se trouver, indexs par des EPosition
+	unsigned int die1,die2;			// Les ds de jeu
 	unsigned int score, scoreP2;	// Les scores des joueurs
 	unsigned int stake;				// Mise courante de la partie
 } SGameState;
 
-// Structure de représentation d'un mouvement
+// Structure de reprsentation d'un mouvement
 typedef struct
 {
 	EPosition src_point;
 	EPosition dest_point;
 } SMove;
 
-// Définition des typedefs pour chargement dynamique
+// Dfinition des typedefs pour chargement dynamique
 typedef void (*pfInitLibrary)(char[50]);
 typedef void (*pfStartMatch)(const unsigned int);
 typedef void (*pfStartGame)();

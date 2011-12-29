@@ -66,25 +66,25 @@ void init_display(display_manager* d_manager ,char* path_img)
 }
 
 
-void interface_display(display_manager* d_manager, SGameState* g_state, player_infos* p_infos, list_messages* l_messages)
+void interface_display(display_manager* d_manager, engine_state* e_state)
 {
 	//on blit tout dans le backbuffer en full hd
 	
 	//background
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(d_manager->background_position));
 	//pions
-	checker_display(d_manager, g_state);
+	checker_display(d_manager, &(e_state->g_state));
 	//nom + score
-	infos_display(d_manager, g_state, p_infos);
+	infos_display(d_manager, e_state);
 	//dés
-	if(g_state->die1 > 0 && g_state->die1 < 7 && g_state->die2 > 0 && g_state->die2 < 7)
+	if(e_state->g_state.die1 > 0 && e_state->g_state.die1 < 7 && e_state->g_state.die2 > 0 && e_state->g_state.die2 < 7)
 	{
-		die_display(d_manager, g_state->die1, 1515, 475);
-		die_display(d_manager, g_state->die2, 1615, 475);
+		die_display(d_manager, e_state->g_state.die1, 1515, 475);
+		die_display(d_manager, e_state->g_state.die2, 1615, 475);
 	}
 	
 	//messages
-	messages_display(d_manager, l_messages);
+	messages_display(d_manager, e_state);
 	
 	//on adapte à la bonne résolution
 	SDL_Surface *tmp;
@@ -208,7 +208,7 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 	
 }
 
-void infos_display(display_manager* d_manager, SGameState* g_state, player_infos* p_infos)
+void infos_display(display_manager* d_manager, engine_state* e_state)
 {
 	SDL_Rect position;
 	SDL_Surface* texte;
@@ -218,11 +218,13 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 	noir.b = 0;
 	char* score_string = (char*)malloc(sizeof(char)*4);
 	
+	
+	
 	/* affichage du type de joueur 2 */
 	position.x= 1430;
 	position.y= 40;
 	
-	if(p_infos->typeP1 == IA)
+	if(e_state->typeP1 == IA)
 	{
 		SDL_BlitSurface(d_manager->icone_ia, NULL, d_manager->backBuffer, &(position));
 	}else
@@ -233,12 +235,12 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 	/* Ecriture du nom et du score du P1 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
 	position.y= 40;
-    texte = TTF_RenderText_Blended(d_manager->font, p_infos->nameP1, noir );
+    texte = TTF_RenderText_Blended(d_manager->font, e_state->nameP1, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
 	position.x= 1515+20;
 	position.y= 125;
-	sprintf(score_string, "%i", g_state->score);
+	sprintf(score_string, "%i", e_state->g_state.score);
     texte = TTF_RenderText_Blended(d_manager->font, score_string, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
@@ -248,7 +250,7 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 	position.x= 1430;
 	position.y= 755;
 	
-	if(p_infos->typeP2 == IA)
+	if(e_state->typeP2 == IA)
 	{
 		SDL_BlitSurface(d_manager->icone_ia, NULL, d_manager->backBuffer, &(position));
 	}else
@@ -259,14 +261,16 @@ void infos_display(display_manager* d_manager, SGameState* g_state, player_infos
 	/* Ecriture du nom et du score du P2 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
 	position.y= 755;
-    texte = TTF_RenderText_Blended(d_manager->font, p_infos->nameP2, noir );
+    texte = TTF_RenderText_Blended(d_manager->font, e_state->nameP2, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
 	position.x= 1515+20;
 	position.y= 840;
-	sprintf(score_string, "%i", g_state->scoreP2);
+	sprintf(score_string, "%i", e_state->g_state.scoreP2);
     texte = TTF_RenderText_Blended(d_manager->font, score_string, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
+	
+	free(score_string);
 }
 
 void die_display(display_manager* d_manager, unsigned int val, int x, int y)
@@ -291,16 +295,16 @@ void die_display(display_manager* d_manager, unsigned int val, int x, int y)
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->screen, &(d_manager->background_position));
 }
 
-void messages_display(display_manager *d_manager, list_messages* l_messages)
+void messages_display(display_manager *d_manager, engine_state* e_state)
 {
 	SDL_Surface *border;
 	
 	SDL_Rect sel_sprite;
 	SDL_Rect position;
 	
-	for(int i = 0; i < l_messages->nb_messages; i++)
+	for(int i = 0; i < e_state->nb_messages; i++)
 	{
-		if(l_messages->tab[i].is_clicked)
+		if(e_state->tab[i].is_clicked)
 		{
 			border = d_manager->message_border_clicked;
 			
@@ -315,8 +319,8 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 0;
 		sel_sprite.w = 30;
 		sel_sprite.h = 30;
-		position.x = l_messages->tab[i].position.x;
-		position.y = l_messages->tab[i].position.y;
+		position.x = e_state->tab[i].position.x;
+		position.y = e_state->tab[i].position.y;
 		
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
@@ -325,7 +329,7 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 0;
 		sel_sprite.w = 30;
 		sel_sprite.h = 30;
-		position.x = l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30;
+		position.x = e_state->tab[i].position.x + e_state->tab[i].position.w - 30;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du coin bas gauche
@@ -333,8 +337,8 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 72;
 		sel_sprite.w = 30;
 		sel_sprite.h = 30;
-		position.x = l_messages->tab[i].position.x;
-		position.y = l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30;
+		position.x = e_state->tab[i].position.x;
+		position.y = e_state->tab[i].position.y + e_state->tab[i].position.h - 30;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du coin bas droit
@@ -342,8 +346,8 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 72;
 		sel_sprite.w = 30;
 		sel_sprite.h = 30;
-		position.x = l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30;
-		position.y = l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30;
+		position.x = e_state->tab[i].position.x + e_state->tab[i].position.w - 30;
+		position.y = e_state->tab[i].position.y + e_state->tab[i].position.h - 30;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage de la bordure haute
@@ -352,18 +356,18 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.w = 40;
 		sel_sprite.h = 30;
 		
-		position.x = l_messages->tab[i].position.x + 30; //on ajoute les 30 px de largeur du coin
-		position.y = l_messages->tab[i].position.y;
+		position.x = e_state->tab[i].position.x + 30; //on ajoute les 30 px de largeur du coin
+		position.y = e_state->tab[i].position.y;
 		//tant qu'on ne dépasse pas la largeur du message (moins le coin, moins un bandeau inférieur à 40px)
 		//on affiche la bordure par tranche de 40 px (voir sprite)
-		while( position.x + 40 <= l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30 ) 
+		while( position.x + 40 <= e_state->tab[i].position.x + e_state->tab[i].position.w - 30 ) 
 		{
 			
 			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.x += 40;
 		}	
 		//on affiche ce qui reste pour finir la bordure
-		sel_sprite.w = (l_messages->tab[i].position.w - 60) % 40;
+		sel_sprite.w = (e_state->tab[i].position.w - 60) % 40;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
@@ -372,16 +376,16 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 72;
 		sel_sprite.w = 40;
 		sel_sprite.h = 30;
-		position.x = l_messages->tab[i].position.x + 30;
-		position.y = l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30;
-		while( position.x + 40 <= l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30 )
+		position.x = e_state->tab[i].position.x + 30;
+		position.y = e_state->tab[i].position.y + e_state->tab[i].position.h - 30;
+		while( position.x + 40 <= e_state->tab[i].position.x + e_state->tab[i].position.w - 30 )
 		{
 			
 			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.x += 40;
 			
 		}	
-		sel_sprite.w = (l_messages->tab[i].position.w - 60) % 40;
+		sel_sprite.w = (e_state->tab[i].position.w - 60) % 40;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
@@ -390,16 +394,16 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 31;
 		sel_sprite.w = 30;
 		sel_sprite.h = 40;
-		position.x = l_messages->tab[i].position.x;
-		position.y = l_messages->tab[i].position.y + 30;
-		while( position.y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30 )
+		position.x = e_state->tab[i].position.x;
+		position.y = e_state->tab[i].position.y + 30;
+		while( position.y + 40 <= e_state->tab[i].position.y + e_state->tab[i].position.h - 30 )
 		{
 			
 			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.y += 40;
 			
 		}	
-		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
+		sel_sprite.h = (e_state->tab[i].position.h - 60) % 40;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
@@ -408,16 +412,16 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.y = 31;
 		sel_sprite.w = 30;
 		sel_sprite.h = 40;
-		position.x = l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30;
-		position.y = l_messages->tab[i].position.y + 30;
-		while( position.y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30 )
+		position.x = e_state->tab[i].position.x + e_state->tab[i].position.w - 30;
+		position.y = e_state->tab[i].position.y + 30;
+		while( position.y + 40 <= e_state->tab[i].position.y + e_state->tab[i].position.h - 30 )
 		{
 			
 			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.y += 40;
 			
 		}	
-		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
+		sel_sprite.h = (e_state->tab[i].position.h - 60) % 40;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		//affichage du fond
@@ -426,45 +430,45 @@ void messages_display(display_manager *d_manager, list_messages* l_messages)
 		sel_sprite.w = 40;
 		sel_sprite.h = 40;
 		
-		position.x = l_messages->tab[i].position.x + 30; //on ajoute les 30 px de largeur du coin
-		position.y = l_messages->tab[i].position.y + 30;
+		position.x = e_state->tab[i].position.x + 30; //on ajoute les 30 px de largeur du coin
+		position.y = e_state->tab[i].position.y + 30;
 		
-		while( position.x + 40 <= l_messages->tab[i].position.x + l_messages->tab[i].position.w - 30)
+		while( position.x + 40 <= e_state->tab[i].position.x + e_state->tab[i].position.w - 30)
 		{
-			while( position. y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30)
+			while( position. y + 40 <= e_state->tab[i].position.y + e_state->tab[i].position.h - 30)
 			{
 				SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 				position.y += 40;
 				
 			}
-			sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
+			sel_sprite.h = (e_state->tab[i].position.h - 60) % 40;
 			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			sel_sprite.h = 40;
-			position.y = l_messages->tab[i].position.y + 30;
+			position.y = e_state->tab[i].position.y + 30;
 			position.x += 40;
 			
 		}
 		
 		//on finit de remplir la partie droite
-		position.y = l_messages->tab[i].position.y + 30;
-		while( position. y + 40 <= l_messages->tab[i].position.y + l_messages->tab[i].position.h - 30)
+		position.y = e_state->tab[i].position.y + 30;
+		while( position. y + 40 <= e_state->tab[i].position.y + e_state->tab[i].position.h - 30)
 		{
-			sel_sprite.w = (l_messages->tab[i].position.w - 60) % 40;
+			sel_sprite.w = (e_state->tab[i].position.w - 60) % 40;
 			SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 			position.y += 40;
 		}
 		
 		//on remplit le dernier coin en bas à droite
-		sel_sprite.h = (l_messages->tab[i].position.h - 60) % 40;
+		sel_sprite.h = (e_state->tab[i].position.h - 60) % 40;
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
-		position.x = l_messages->tab[i].position.x+40;
-		position.y = l_messages->tab[i].position.y+40;
+		position.x = e_state->tab[i].position.x+40;
+		position.y = e_state->tab[i].position.y+40;
 		
-		for(int j = 0; j < l_messages->tab[i].nb_lines; j++)
+		for(int j = 0; j < e_state->tab[i].nb_lines; j++)
 		{
-			SDL_BlitSurface(l_messages->tab[i].lines[j], NULL, d_manager->backBuffer, &(position));
+			SDL_BlitSurface(e_state->tab[i].lines[j], NULL, d_manager->backBuffer, &(position));
 			position.y += 60;
 		}
 		
@@ -485,6 +489,7 @@ void free_surface(display_manager* d_manager)
     SDL_FreeSurface(d_manager->dice);
 	SDL_FreeSurface(d_manager->message_border);
 	SDL_FreeSurface(d_manager->message_border_clicked);
+	free(d_manager->path_img);
 	
 }
 
