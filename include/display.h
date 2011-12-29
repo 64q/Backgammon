@@ -75,15 +75,15 @@ void checker_display(display_manager*, SGameState*);
 
 
 //affiche les scores et autres informations (private)
-void infos_display(display_manager*, SGameState*, player_infos* );
+void infos_display(display_manager*, engine_state*);
 
 //affiche l'interface fond + pion + score ...
-void interface_display(display_manager*, SGameState*, player_infos*, list_messages*);
+void interface_display(display_manager*,engine_state*);
 
 //affiche les dés dans leur zones 
 void die_display(display_manager* d_manager, unsigned int val, int x, int y);
 
-void messages_display(display_manager *d_manager, list_messages* l_messages);
+void messages_display(display_manager *d_manager, engine_state*);
 
 //libère les SDL_Surface
 void free_surface(display_manager*);

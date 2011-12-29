@@ -11,17 +11,6 @@
 #define IA 1
 #define HUMAN 2
 
-typedef void (*ptr_fct_message)(void);
-
-typedef struct player_infos
-{
-	char *nameP1;
-	int typeP1; 
-	
-	char *nameP2;
-	int typeP2;
-
-}player_infos;
 
 typedef struct message
 {
@@ -29,29 +18,48 @@ typedef struct message
 	int nb_lines;
 	SDL_Rect position;
 	bool is_clicked;
-	ptr_fct_message function;
 	
 }message;
 
-typedef struct list_messages
+
+
+
+typedef struct engine_state
 {
+	char *nameP1;
+	int typeP1; 
+	
+	char *nameP2;
+	int typeP2;
+	
 	message tab[10];
+	void (*function[10])(struct engine_state*);
 	int nb_messages;
 	
-}list_messages;
+	SGameState g_state;
+	
+	bool run;
+
+}engine_state;
+
+typedef void (*ptr_fct_message)(engine_state*);
+
+
+
 
 //initialise la structure player_infos avec le nom de chaque joueur et son type (IA ou HUMAN)
-void init_player(player_infos*, char *nameP1, int typeP1, char *nameP2, int typeP2);
+void init_engine(engine_state*, char *nameP1, int typeP1, char *nameP2, int typeP2);
 
-//initialise l'état du jeu au départ
+//initialise l'état du jeu au départ (private)
 void init_game(SGameState*);
 
-void add_message(TTF_Font * font, list_messages*, char* , int x, int y, int width, int height,  ptr_fct_message function);
+void add_message(engine_state* e_state, TTF_Font *font, char* , int x, int y, int width, int height,  ptr_fct_message function);
 
-void on_click_listener(list_messages* list, double ratio);
-void on_unclick_listener(list_messages* list, double ratio);
+void on_click_listener(engine_state* e_state, double ratio);
+void on_unclick_listener(engine_state* e_state, double ratio);
 
-void throw_dice();
-void shutdown();
+void erase_messages(engine_state* e_state);
+void throw_dice(engine_state*);
+void shutdown(engine_state*);
 
 #endif
