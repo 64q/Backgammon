@@ -4,7 +4,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
-
+ 
 #include "backgammon.h"
 #include "engine.h"
 
@@ -31,6 +31,9 @@ typedef struct display_manager
 	
 	SDL_Surface *dice;
 	
+	SDL_Surface *message_border;
+	SDL_Surface *message_border_clicked;
+	
 	//font
 	TTF_Font *font;
 	
@@ -51,8 +54,12 @@ typedef struct display_manager
 	
 	//ratio entre les images (full hd) et la résoltion de la fenêtre
 	double ratio;
+	
+	
 
 } display_manager;
+
+
 
 
 //initialise la structure d'affichage et ouvre la fenetre
@@ -68,13 +75,15 @@ void checker_display(display_manager*, SGameState*);
 
 
 //affiche les scores et autres informations (private)
-void infos_display(display_manager*, SGameState*, player_infos* );
+void infos_display(display_manager*, engine_state*);
 
 //affiche l'interface fond + pion + score ...
-void interface_display(display_manager*, SGameState*, player_infos*);
+void interface_display(display_manager*,engine_state*);
 
 //affiche les dés dans leur zones 
-void dices_display(display_manager* d_manager, unsigned int val, int x, int y);
+void die_display(display_manager* d_manager, unsigned int val, int x, int y);
+
+void messages_display(display_manager *d_manager, engine_state*);
 
 //libère les SDL_Surface
 void free_surface(display_manager*);
