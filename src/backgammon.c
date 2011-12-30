@@ -36,20 +36,13 @@ int main(int argc, char *argv[])
 
 	init_display(&d_manager, "./styles/default/");
 
-	//SGameState g_state;
-	//init_game(&g_state); 
-
-	//player_infos p_infos;
-	//init_player(&p_infos, "Erwan", HUMAN, "Ordi", IA);
 	
-	//list_messages l_messages;
-	//l_messages.nb_messages = 0;
 	engine_state e_state;
 	init_engine(&e_state,"Erwan", HUMAN, "Ordi", IA);
 	
 	
-	add_message(&e_state, d_manager.font, "   Jouer!   " , 760, 455, 400, 170,  erase_messages );
-	add_message( &e_state, d_manager.font,"  Quitter " , 760, 650, 400, 170,  shutdown );
+	add_message(&e_state, "   Jouer!   " , 760, 455, 400, 170,  start );
+	add_message( &e_state,"  Quitter " , 760, 650, 400, 170,  shutdown );
 
 	//TEST
 // 	g_state.score = 3;
@@ -58,7 +51,7 @@ int main(int argc, char *argv[])
 // 	g_state.zones[EPos_BarP2].nb_checkers=4;
 // 	g_state.die1 = 3;
 // 	g_state.die2 = 5;
-
+	//e_state.g_state.zones[EPos_12].nb_checkers=10;
 
 	
 	SDL_Event event;

@@ -14,7 +14,7 @@
 
 typedef struct message
 {
-	SDL_Surface *lines[10];
+	char **lines;
 	int nb_lines;
 	SDL_Rect position;
 	bool is_clicked;
@@ -53,13 +53,14 @@ void init_engine(engine_state*, char *nameP1, int typeP1, char *nameP2, int type
 //initialise l'état du jeu au départ (private)
 void init_game(SGameState*);
 
-void add_message(engine_state* e_state, TTF_Font *font, char* , int x, int y, int width, int height,  ptr_fct_message function);
+void add_message(engine_state* e_state, char* , int x, int y, int width, int height,  ptr_fct_message function);
 
 void on_click_listener(engine_state* e_state, double ratio);
 void on_unclick_listener(engine_state* e_state, double ratio);
 
+void start(engine_state* e_state);
 void erase_messages(engine_state* e_state);
 void throw_dice(engine_state*);
 void shutdown(engine_state*);
-
+void first_to_play(engine_state* e_state);
 #endif
