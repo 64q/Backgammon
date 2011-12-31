@@ -8,20 +8,11 @@
 #include "ai.h"
 
 #define AI_MAX_MOVES 50
-// Les bonus
-#define AI_BON_SECURE 2
-#define AI_BON_TAKE 1
-#define AI_BON_MOVE 0
-// Les pénalités
-#define AI_PEN_NO 0
-#define AI_PEN_ALONE 1
 
 // Définition des structures locales
 typedef struct {
 	int src;
 	int dest;
-	int bonus;
-	int penalty;
 } ai_move;
 
 // Définition des variables locales
@@ -31,8 +22,6 @@ SGameState* ai_game_state;
 unsigned int ai_target_score;
 
 // Définition des fonctions locales
-void ai_update_moves();
-int validate_move(const SGameState * const gameState, ai_move move);
 
 // Initialise la librairie
 void InitLibrary(char name[50])
@@ -48,8 +37,6 @@ void StartMatch(const unsigned int target_score)
 	{
 			ai_moves[i].src = -1;
 			ai_moves[i].dest = -1;
-			ai_moves[i].bonus = 0;
-			ai_moves[i].penalty = 0;
 	}
 	
 	// Init vars
@@ -83,7 +70,7 @@ int DoubleStack(const SGameState * const gameState)
 // Prendre un doublage
 int TakeDouble(const SGameState * const gameState)
 {
-	return 0;
+	return 1;
 }
 
 // Retourner une liste de mouvements
@@ -92,77 +79,44 @@ void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned i
 	ai_game_state = gameState;
 }
 
-// -----------------
-int empty_bar()
+void ai_play()
 {
-	return ai_game_state->zones[EPos_BarP1] == 0;
-}
-
-// Fonctions perso
-void ai_update_moves()
-{
-	int curr = 0, is_movable = 0;
-	int dice[4] = {ai_game_state->die1, ai_game_state->die2, 0, 0};
+	int max = -1000;
+	int moves = 2;
+	int dice[4] = {ai_game_state->dice1, ai_game_state->dice2, 0, 0};
 	
-	if (ai_game_state->die1 == ai_game_state->die2)
+	ai_move move;
+	
+	if (ai_game_state->dice1 == ai_game_state->dice2)
 	{
-		dice[2] = ai_game_state->die1;
-		dice[3] = ai_game_state->die1;
+		moves = 4;
+		dice[2] = ai_game_state->dice1;
+		dice[3] = ai_game_state->dice1;
 	}
 	
-	// Parcourt des pions prisonniers
-	if (!empty_bar())
+	// Etablissement de tous les coups possibles
+	for (int i = 0; i < moves; i++)
 	{
-		
-	}
-	
-	// Parcourt du plateau de jeu
-	for (unsigned int i = EPos_24; i <= EPos_1; i--)
-	{
-		for (unsigned int j = 0; j < 2; j++)
+		for (int j = EPos_24; j <= EPos_1; j--)
 		{
-			if (ai_game_state->zones[i].player == EPlayer1 && ai_game_state->zones[i].nb_checkers > 0)
+			// L'IA est considéré comme J1
+			if (ai_game_state->zones[j].player == EPlayer1)
 			{
-				// Listons à présent les mouvements possible depuis la case i
-				// Dé 1
-				if (ai_game_state->zones[i - dice[j]].player == EPlayer2 && ai_game_state->zones[i - dice[j]].nb_checkers <= 1)
+				if (ai_game_state->zones[j - dice[i]].nb_checkers <= 0)
 				{
-					ai_moves[curr].src = i;
-					ai_moves[curr].dest = i - dice[j];
-					ai_moves[curr].bonus = AI_BON_MOVE;
-				
-					is_movable = 1;
-				}
-				else if (ai_game_state->zones[i - dice[j]].player == EPlayer1)
-				{
-					ai_moves[curr].src = i;
-					ai_moves[curr].dest = i - dice[j];
-				
-					is_movable = 1;
-				}
-			
-				// Si deplacement possible, calcul de la pénalité de move
-				if (is_movable)
-				{
-					// Mouvement risqué, ajout d'une pénalité
-					if (ai_game_state->zones[i].nb_checkers == 2)
-					{
-						ai_moves[curr].penalty = AI_PEN_ALONE;
-					}
-					else if ((ai_game_state->zones[i - dice[j]].nb_checkers + 1) >= 2)
-					{
-						ai_moves[curr].bonus += AI_BON_SECURE;
-					} 
-				
-					is_movable = 0;
-					curr = curr + 1;
-				}
+					ai_simulate(
+				}	
 			}
 		}
 	}
 }
 
-int validate_move(const SGameState * const gameState, ai_move move)
+void ai_simulate()
+{
+
+}
+
+void ai_cancel()
 {
 
 }
