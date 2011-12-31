@@ -79,8 +79,13 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	//dés
 	if(e_state->g_state.die1 > 0 && e_state->g_state.die1 < 7 && e_state->g_state.die2 > 0 && e_state->g_state.die2 < 7)
 	{
-		die_display(d_manager, e_state->g_state.die1, 1515, 475);
-		die_display(d_manager, e_state->g_state.die2, 1615, 475);
+		die_display(d_manager, e_state->g_state.die1, 1570, 500);
+		die_display(d_manager, e_state->g_state.die2, 1660, 500);
+		if(e_state->g_state.die1 == e_state->g_state.die2)
+		{
+			die_display(d_manager, e_state->g_state.die2, 1485, 500);
+			die_display(d_manager, e_state->g_state.die2, 1745, 500);
+		}
 	}
 	
 	//messages
@@ -98,13 +103,19 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 void checker_display(display_manager* d_manager, SGameState* g_state)
 {
 	SDL_Rect checker_position;
+	SDL_Surface* texte;
+	char checker_number[3];
+	SDL_Color noir;
+	noir.r = 0;
+	noir.g = 0;
+	noir.b = 0;
 	
 	//affichage de la partie basse droite
 	for(int i = 0; i < 6; i++)
 	{
 		checker_position.x = 1180 - i * 100;
 		checker_position.y = 970;
-		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers; j++)
+		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers && j < 5; j++)
 		{
 			if(g_state->zones[i].player == EPlayer1)
 				SDL_BlitSurface(d_manager->white, NULL, d_manager->backBuffer, &(checker_position));
@@ -115,6 +126,14 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 			
 			checker_position.y -= 100; 
 		}
+		if(g_state->zones[i].nb_checkers > 5)
+		{
+			checker_position.x += 22;
+			checker_position.y += 113;
+			sprintf(checker_number, "%i", g_state->zones[i].nb_checkers);
+			texte = TTF_RenderText_Blended(d_manager->font, checker_number, noir );
+			SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(checker_position));
+		}
 		
 		
 	}
@@ -124,7 +143,7 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 	{
 		checker_position.x = 510 - (i-6) * 100;
 		checker_position.y = 970;
-		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers; j++)
+		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers && j < 5; j++)
 		{
 			if(g_state->zones[i].player == EPlayer1)
 				SDL_BlitSurface(d_manager->white, NULL, d_manager->backBuffer, &(checker_position));
@@ -135,15 +154,23 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 			
 			checker_position.y -= 100;
 		}
-		
+		if(g_state->zones[i].nb_checkers > 5)
+		{
+			checker_position.x += 22;
+			checker_position.y += 113;
+			sprintf(checker_number, "%i", g_state->zones[i].nb_checkers);
+			texte = TTF_RenderText_Blended(d_manager->font, checker_number, noir );
+			SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(checker_position));
+		}
 	}
+	
 	
 	//affichage de la partie haute gauche
 	for(int i = 12; i < 18; i++)
 	{
 		checker_position.x = 10 + 100 * (i-12) ;
 		checker_position.y = 10;
-		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers; j++)
+		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers && j < 5; j++)
 		{
 			if(g_state->zones[i].player == EPlayer1)
 				SDL_BlitSurface(d_manager->white, NULL, d_manager->backBuffer, &(checker_position));
@@ -154,6 +181,14 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 			
 			checker_position.y += 100;
 		}
+		if(g_state->zones[i].nb_checkers > 5)
+		{
+			checker_position.x += 22;
+			checker_position.y += 113;
+			sprintf(checker_number, "%i", g_state->zones[i].nb_checkers);
+			texte = TTF_RenderText_Blended(d_manager->font, checker_number, noir );
+			SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(checker_position));
+		}
 		
 	}
 	
@@ -162,7 +197,7 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 	{
 		checker_position.x = 680 + 100 * (i-18);
 		checker_position.y = 10;
-		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers; j++)
+		for(unsigned int j = 0; j < g_state->zones[i].nb_checkers && j < 5; j++)
 		{
 			if(g_state->zones[i].player == EPlayer1)
 				SDL_BlitSurface(d_manager->white, NULL, d_manager->backBuffer, &(checker_position));
@@ -172,6 +207,14 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 				SDL_BlitSurface(d_manager->black, NULL, d_manager->backBuffer, &(checker_position));
 			
 			checker_position.y += 100;
+		}
+		if(g_state->zones[i].nb_checkers > 5)
+		{
+			checker_position.x += 22;
+			checker_position.y += 113;
+			sprintf(checker_number, "%i", g_state->zones[i].nb_checkers);
+			texte = TTF_RenderText_Blended(d_manager->font, checker_number, noir );
+			SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(checker_position));
 		}
 		
 	}
@@ -235,7 +278,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	/* Ecriture du nom et du score du P1 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
 	position.y= 40;
-    texte = TTF_RenderText_Blended(d_manager->font, e_state->nameP1, noir );
+    texte = TTF_RenderUTF8_Blended(d_manager->font, e_state->nameP1, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
 	position.x= 1515+20;
@@ -261,7 +304,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	/* Ecriture du nom et du score du P2 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
 	position.y= 755;
-    texte = TTF_RenderText_Blended(d_manager->font, e_state->nameP2, noir );
+    texte = TTF_RenderUTF8_Blended(d_manager->font, e_state->nameP2, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
 	position.x= 1515+20;
@@ -298,9 +341,15 @@ void die_display(display_manager* d_manager, unsigned int val, int x, int y)
 void messages_display(display_manager *d_manager, engine_state* e_state)
 {
 	SDL_Surface *border;
+	SDL_Surface *text;
 	
 	SDL_Rect sel_sprite;
 	SDL_Rect position;
+	
+	SDL_Color noir;
+	noir.r = 0;
+	noir.g = 0;
+	noir.b = 0;
 	
 	for(int i = 0; i < e_state->nb_messages; i++)
 	{
@@ -463,13 +512,18 @@ void messages_display(display_manager *d_manager, engine_state* e_state)
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
-		position.x = e_state->tab[i].position.x+40;
+		
 		position.y = e_state->tab[i].position.y+40;
 		
 		for(int j = 0; j < e_state->tab[i].nb_lines; j++)
 		{
-			SDL_BlitSurface(e_state->tab[i].lines[j], NULL, d_manager->backBuffer, &(position));
+			text = TTF_RenderUTF8_Blended(d_manager->font, e_state->tab[i].lines[j], noir);
+			//pour centrer le texte
+			position.x = e_state->tab[i].position.x + (e_state->tab[i].position.w / 2) - text->w/2;
+			
+			SDL_BlitSurface(text, NULL, d_manager->backBuffer, &(position));
 			position.y += 60;
+			SDL_FreeSurface(text);
 		}
 		
 	}
