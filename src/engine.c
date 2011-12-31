@@ -14,21 +14,17 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 {
 	bool load = true;
 	char error[200];
-	e_state->nameP1 = (char*)malloc(50 * sizeof(char) );
-	strcpy(e_state->nameP1, nameP1);
+	strcpy(e_state->player_1.name, nameP1);
 	
-	e_state->nameP2 = (char*)malloc(50 * sizeof(char) );
-	strcpy(e_state->nameP2, nameP2);
+	strcpy(e_state->player_2.name, nameP2);
 	
-	e_state->typeP1 = typeP1;
-	e_state->typeP2 = typeP2;
+	e_state->player_1.type = typeP1;
+	e_state->player_2.type = typeP2;
 	
 	e_state->nb_messages = 0;
-	
+	void *lib;
 	if( typeP1 == IA )
 	{
-		void *lib;
-		
 		if ((lib = dlopen(path_lib_P1, RTLD_LAZY)) == NULL)
 		{
 			sprintf(error, "erreur dans le\n chargement\nde la librairie de \n%s", nameP1);
@@ -36,17 +32,12 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 			load = false;
 		}else
 		{
-			load_functions_IA(&(e_state->functions_P1), lib);
+			load_functions_IA(&(e_state->player_1.functions), lib);
 		}
-	}else
-	{
-		
 	}
 	
 	if( typeP2 == IA )
 	{
-		void *lib;
-		
 		if ((lib = dlopen(path_lib_P2, RTLD_LAZY)) == NULL)
 		{
 			sprintf(error, "erreur dans le\n chargement\nde la librairie de \n%s", nameP2);
@@ -54,30 +45,14 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 			load = false;
 		}else
 		{
-			load_functions_IA( &(e_state->functions_P2) , lib);
+			load_functions_IA( &(e_state->player_2.functions) , lib);
 		}
-	}else
-	{
-		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	e_state->run = true;
 	e_state->score_to_reach = 3;
-	
+	e_state->stake_owner = 0;
 	init_game( &(e_state->g_state) );
 	
 	srand(time(NULL));
@@ -237,15 +212,15 @@ void on_unclick_listener(engine_state* e_state, double ratio)
 
 void start_match(engine_state* e_state)
 {
-	if( e_state->typeP1 == IA )
+	if( e_state->player_1.type == IA )
 	{
-		e_state->functions_P1.init_lib(e_state->nameP1);
-		e_state->functions_P1.start_match(e_state->score_to_reach);
+		e_state->player_1.functions.init_lib(e_state->player_1.name);
+		e_state->player_1.functions.start_match(e_state->score_to_reach);
 	}
-	if( e_state->typeP2 == IA )
+	if( e_state->player_2.type == IA )
 	{
-		e_state->functions_P2.init_lib(e_state->nameP1);
-		e_state->functions_P2.start_match(e_state->score_to_reach);
+		e_state->player_2.functions.init_lib(e_state->player_2.name);
+		e_state->player_2.functions.start_match(e_state->score_to_reach);
 	}
 	start_game(e_state);
 	
@@ -292,11 +267,18 @@ void first_to_play(engine_state* e_state)
 	{
 		if(e_state->g_state.die1 > e_state->g_state.die2)
 		{
-			sprintf(tmp, "%s\nva commencer\nà jouer", e_state->nameP1);
-			add_message(e_state,tmp, 700, 455, 520, 300, play_P1);
+			sprintf(tmp, "%s\nva commencer\nà jouer", e_state->player_1.name);
+			if( e_state->player_1.type == IA )
+			{
+				SMove moves[4];
+				SGameState g_state_cpy;
+				copy_game_state(&g_state_cpy, &(e_state->g_state) );
+				e_state->player_1.functions.make_decision(&g_state_cpy, moves, false);
+					
+			}
 		}else
 		{
-			sprintf(tmp, "%s\nva commencer\nà jouer", e_state->nameP2);
+			sprintf(tmp, "%s\nva commencer\nà jouer", e_state->player_2.name);
 			add_message(e_state,tmp, 700, 455, 520, 300, NULL);
 		}
 			
@@ -326,19 +308,29 @@ void start_game(engine_state* e_state)
 	add_message(e_state,"lancer\nles dés", 700, 455, 330, 220, first_to_play);
 }
 
-void play_P1(engine_state* e_state)
+void play_turn(engine_state* e_state, player* active_player, player* opponent)
 {
-	if( e_state->typeP1 == IA )
+	if( active_player->type == IA )
 	{
 		throw_dice(e_state);
 		SGameState g_state_cpy;
 		copy_game_state(&g_state_cpy, &(e_state->g_state) );
+		if( active_player->functions.double_stack(&g_state_cpy) )
+		{
+			if( opponent->type == IA )
+			{
+				copy_game_state(&g_state_cpy, &(e_state->g_state) );
+				if( opponent->functions.take_double(&g_state_cpy) )
+				{
+					double_stack(e_state);
+				}
+			}
+		}
 	}
 }
 
 void copy_game_state(SGameState* g_state_cpy, SGameState* g_state)
 {
-	
 	for(int i = 0; i < 28; i++)
 	{
 		g_state_cpy->zones[i].player = g_state->zones[i].player;
@@ -353,6 +345,10 @@ void copy_game_state(SGameState* g_state_cpy, SGameState* g_state)
 	g_state_cpy->stake = g_state->stake;
 }
 
+void double_stack(engine_state* e_state)
+{
+	e_state->g_state.stake *= 2;
+}
 
 
 

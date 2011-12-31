@@ -38,16 +38,19 @@ typedef struct functions
 	
 }functions;
 
+typedef struct player
+{
+	char name[50];
+	int type; //IA ou HUMAN
+	functions functions;
+}player;
+
 
 typedef struct engine_state
 {
-	char *nameP1;
-	int typeP1; //IA ou HUMAN
-	functions functions_P1;
+	player player_1;
 	
-	char *nameP2;
-	int typeP2; //IA ou HUMAN
-	functions functions_P2;
+	player player_2;
 	
 	//il peut y a voir jusqu'à 10 messages en même temps
 	message tab[10];
@@ -60,6 +63,8 @@ typedef struct engine_state
 	bool run;
 	
 	int score_to_reach;
+	
+	int stake_owner;
 
 }engine_state;
 
@@ -68,7 +73,7 @@ typedef void (*ptr_fct_message)(engine_state*);
 
 
 
-//initialise la structure player_infos avec le nom de chaque joueur et son type (IA ou HUMAN)
+//initialise la structure engine_state avec le nom de chaque joueur et son type (IA ou HUMAN)
 void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib_P1, char *nameP2, int typeP2, char* path_lib_P2);
 
 //initialise l'état du jeu au départ (private)
@@ -88,5 +93,7 @@ void first_to_play(engine_state* e_state);
 void load_functions_IA(functions* ptr_functions, void* lib);
 void start_game(engine_state* e_state);
 void copy_game_state(SGameState* g_state_cpy, SGameState* g_state);
-void play_P1(engine_state* e_state);
+void play_turn(engine_state* e_state, player* active_player, player* opponent);
+
+void double_stack(engine_state* e_state);
 #endif
