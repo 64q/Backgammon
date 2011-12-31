@@ -512,14 +512,18 @@ void messages_display(display_manager *d_manager, engine_state* e_state)
 		SDL_BlitSurface(border, &sel_sprite, d_manager->backBuffer, &(position));
 		
 		
-		position.x = e_state->tab[i].position.x+40;
+		
 		position.y = e_state->tab[i].position.y+40;
 		
 		for(int j = 0; j < e_state->tab[i].nb_lines; j++)
 		{
 			text = TTF_RenderUTF8_Blended(d_manager->font, e_state->tab[i].lines[j], noir);
+			//pour centrer le texte
+			position.x = e_state->tab[i].position.x + (e_state->tab[i].position.w / 2) - text->w/2;
+			
 			SDL_BlitSurface(text, NULL, d_manager->backBuffer, &(position));
 			position.y += 60;
+			SDL_FreeSurface(text);
 		}
 		
 	}

@@ -4,12 +4,16 @@
 #include <SDL/SDL_ttf.h>
 #include <stdbool.h>
 #include <time.h>
+#include <dlfcn.h>
+
 // Includes persos
 #include "../include/backgammon.h"
 #include "../include/engine.h"
 
-void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, int typeP2)
+void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib_P1, char *nameP2, int typeP2, char* path_lib_P2)
 {
+	bool load = true;
+	char error[200];
 	e_state->nameP1 = (char*)malloc(50 * sizeof(char) );
 	strcpy(e_state->nameP1, nameP1);
 	
@@ -21,11 +25,70 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, 
 	
 	e_state->nb_messages = 0;
 	
+	if( typeP1 == IA )
+	{
+		void *lib;
+		
+		if ((lib = dlopen(path_lib_P1, RTLD_LAZY)) == NULL)
+		{
+			sprintf(error, "erreur dans le\n chargement\nde la librairie de \n%s", nameP1);
+			add_message(e_state,error , 550, 200, 700, 350, NULL);
+			load = false;
+		}else
+		{
+			load_functions_IA(&(e_state->functions_P1), lib);
+		}
+	}else
+	{
+		
+	}
+	
+	if( typeP2 == IA )
+	{
+		void *lib;
+		
+		if ((lib = dlopen(path_lib_P2, RTLD_LAZY)) == NULL)
+		{
+			sprintf(error, "erreur dans le\n chargement\nde la librairie de \n%s", nameP2);
+			add_message(e_state, error, 550, 600, 700, 350, NULL);
+			load = false;
+		}else
+		{
+			load_functions_IA( &(e_state->functions_P2) , lib);
+		}
+	}else
+	{
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	e_state->run = true;
+	e_state->score_to_reach = 3;
 	
 	init_game( &(e_state->g_state) );
 	
 	srand(time(NULL));
+	if(load)
+	{
+		add_message(e_state, "Jouer!" , 760, 455, 400, 170,  start_match );
+		add_message(e_state,"Quitter" , 760, 650, 400, 170,  shutdown );
+	}else
+	{
+		add_message(e_state, "Quitter!" , 1450, 455, 400, 170,  shutdown );
+	}
 }
 
 
@@ -172,23 +235,36 @@ void on_unclick_listener(engine_state* e_state, double ratio)
 	}
 }
 
-void start(engine_state* e_state)
+void start_match(engine_state* e_state)
 {
-	erase_messages(e_state);
-	add_message(e_state,"lancer\nles dés", 700, 455, 330, 220, first_to_play);
+	if( e_state->typeP1 == IA )
+	{
+		e_state->functions_P1.init_lib(e_state->nameP1);
+		e_state->functions_P1.start_match(e_state->score_to_reach);
+	}
+	if( e_state->typeP2 == IA )
+	{
+		e_state->functions_P2.init_lib(e_state->nameP1);
+		e_state->functions_P2.start_match(e_state->score_to_reach);
+	}
+	start_game(e_state);
 	
 }
 void erase_messages(engine_state* e_state)
 {
+	
 	for(int i = 0; i < e_state->nb_messages; i++)
 	{
-		for(int j = 5; j < 0; j--)
-		{
-			free(e_state->tab[i].lines[j]);		
+		if(e_state->tab[i].lines != NULL)
+		{			
+			for(int j = 0; j > 5; j++)
+			{
+				free(e_state->tab[i].lines[j]);		
+			}
+			free(e_state->tab[i].lines);		
 		}
-		free(e_state->tab[i].lines);		
 	}
-	e_state->nb_messages = 0;
+ 	e_state->nb_messages = 0;
 	
 }
 
@@ -211,20 +287,70 @@ void first_to_play(engine_state* e_state)
 	
 	if(e_state->g_state.die1 == e_state->g_state.die2)
 	{
-		add_message(e_state,"    égalité!\nrelancer le dé", 700, 455, 520, 220, first_to_play);
+		add_message(e_state,"égalité!\nrelancer le dé", 700, 455, 520, 220, first_to_play);
 	}else
 	{
 		if(e_state->g_state.die1 > e_state->g_state.die2)
 		{
-			sprintf(tmp, "%s\nva commencer\n    à jouer", e_state->nameP1);
-			add_message(e_state,tmp, 700, 455, 520, 300, NULL);
+			sprintf(tmp, "%s\nva commencer\nà jouer", e_state->nameP1);
+			add_message(e_state,tmp, 700, 455, 520, 300, play_P1);
 		}else
 		{
-			sprintf(tmp, "%s\nva commencer\n    à jouer", e_state->nameP2);
+			sprintf(tmp, "%s\nva commencer\nà jouer", e_state->nameP2);
 			add_message(e_state,tmp, 700, 455, 520, 300, NULL);
 		}
 			
 	}
+}
+
+void load_functions_IA(functions* ptr_functions, void* lib)
+{
+	ptr_functions->init_lib = dlsym (lib, "InitLibrary");
+	ptr_functions->start_match = dlsym (lib, "StartMatch");
+	ptr_functions->start_game = dlsym (lib, "StartGame");
+	ptr_functions->end_game = dlsym (lib, "EndGame");
+	ptr_functions->end_match = dlsym (lib, "EndMatch");
+	ptr_functions->double_stack = dlsym (lib, "DoubleStack");
+	ptr_functions->take_double = dlsym (lib, "TakeDouble");
+	ptr_functions->make_decision = dlsym (lib, "MakeDecision");
+	char * error;
+	if ((error = dlerror()) != NULL)  {
+        fprintf (stderr, "ERREUR LORS DU CHARGEMENT DES FONCTIONS : %s\n", error);
+        exit(1);
+    }
+}
+
+void start_game(engine_state* e_state)
+{
+	erase_messages(e_state);
+	add_message(e_state,"lancer\nles dés", 700, 455, 330, 220, first_to_play);
+}
+
+void play_P1(engine_state* e_state)
+{
+	if( e_state->typeP1 == IA )
+	{
+		throw_dice(e_state);
+		SGameState g_state_cpy;
+		copy_game_state(&g_state_cpy, &(e_state->g_state) );
+	}
+}
+
+void copy_game_state(SGameState* g_state_cpy, SGameState* g_state)
+{
+	
+	for(int i = 0; i < 28; i++)
+	{
+		g_state_cpy->zones[i].player = g_state->zones[i].player;
+		g_state_cpy->zones[i].nb_checkers = g_state->zones[i].nb_checkers;
+	}
+	g_state_cpy->die1 = g_state->die1;
+	g_state_cpy->die2 = g_state->die2;
+	
+	g_state_cpy->score = g_state->score;
+	g_state_cpy->scoreP2 = g_state->scoreP2;
+	
+	g_state_cpy->stake = g_state->stake;
 }
 
 

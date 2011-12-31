@@ -22,36 +22,17 @@ int main(int argc, char *argv[])
 		//exit(1);
 	}
 
-	// Ouverture dynamique de la bibliothèque
-	if ((lib = dlopen(*(argv + 1), RTLD_LAZY)) == NULL)
-	{
-		fprintf(stderr, "Error: %s\n", dlerror());
-		//exit(1);
-	}
 
 	int fps = 60;
 	int delay = 1000/fps;
 
 	display_manager d_manager;
-
-	init_display(&d_manager, "./styles/default/");
+	init_display(&d_manager, "./styles/quentin/");
 
 	
 	engine_state e_state;
-	init_engine(&e_state,"Erwan", HUMAN, "Ordi", IA);
+	init_engine(&e_state,"Erwan", HUMAN, "", "Ordi", IA, "./lib/libai.so");
 	
-	
-	add_message(&e_state, "   Jouer!   " , 760, 455, 400, 170,  start );
-	add_message( &e_state,"  Quitter " , 760, 650, 400, 170,  shutdown );
-
-	//TEST
-// 	g_state.score = 3;
-// 	g_state.scoreP2 = 2;
-// 	g_state.zones[EPos_BarP1].nb_checkers=3;
-// 	g_state.zones[EPos_BarP2].nb_checkers=4;
-// 	g_state.die1 = 3;
-// 	g_state.die2 = 5;
-	//e_state.g_state.zones[EPos_12].nb_checkers=10;
 
 	
 	SDL_Event event;
@@ -67,7 +48,6 @@ int main(int argc, char *argv[])
 		{
 			switch(event.type)
 			{
-				printf("u\n");
 				case SDL_QUIT:
 					shutdown(&e_state);
 					break;
