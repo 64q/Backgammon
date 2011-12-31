@@ -93,11 +93,29 @@ void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned i
 }
 
 // -----------------
+int empty_bar()
+{
+	return ai_game_state->zones[EPos_BarP1] == 0;
+}
+
 // Fonctions perso
 void ai_update_moves()
 {
 	int curr = 0, is_movable = 0;
-	int dice[2] = {ai_game_state->die1, ai_game_state->die2};
+	int dice[4] = {ai_game_state->die1, ai_game_state->die2, 0, 0};
+	
+	if (ai_game_state->die1 == ai_game_state->die2)
+	{
+		dice[2] = ai_game_state->die1;
+		dice[3] = ai_game_state->die1;
+	}
+	
+	// Parcourt des pions prisonniers
+	if (!empty_bar())
+	{
+		
+	}
+	
 	// Parcourt du plateau de jeu
 	for (unsigned int i = EPos_24; i <= EPos_1; i--)
 	{
