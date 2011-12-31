@@ -21,7 +21,38 @@ ai_move ai_moves[AI_MAX_MOVES];
 SGameState* ai_game_state;
 unsigned int ai_target_score;
 
+// ----------------------------------
 // Définition des fonctions locales
+
+/**
+ * Faire jouer l'IA de manière virtuelle
+ */
+void ai_play();
+
+/**
+ * Simulation d'un coup de l'IA
+ */
+void ai_simulate(ai_move move);
+
+/**
+ * Evaluer une configuration de jeu
+ */
+int ai_evaluate_game();
+
+/**
+ * Max function
+ */
+int ai_max(int depth);
+
+/**
+ * Min function
+ */
+int ai_min(int depth);
+
+/**
+ * Annuler un coup fictif sur le plateau
+ */
+void ai_cancel();
 
 // Initialise la librairie
 void InitLibrary(char name[50])
@@ -77,9 +108,15 @@ int TakeDouble(const SGameState * const gameState)
 void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned int lastTimeError)
 {
 	ai_game_state = gameState;
+	
+	// 1ère étape, vérifier les pions dans la barre
+	
+	// 2nde étape, vérifier si on doit rentrer les pions
+	
+	// 3ème étape, jouer normalement
 }
 
-void ai_play()
+void ai_play(int *dice, int moves)
 {
 	int max = -1000;
 	int moves = 2;
@@ -102,16 +139,33 @@ void ai_play()
 			// L'IA est considéré comme J1
 			if (ai_game_state->zones[j].player == EPlayer1)
 			{
-				if (ai_game_state->zones[j - dice[i]].nb_checkers <= 0)
+				if (ai_game_state->zones[j - dice[i]].nb_checkers <= 0 || ai_game_state->zones[j - dice[i]].player == EPlayer1)
 				{
-					ai_simulate(
+					move.src = j;
+					move.dest = j - dice[i];
+					ai_simulate(move);
 				}	
 			}
 		}
 	}
 }
 
-void ai_simulate()
+void ai_simulate(ai_move move)
+{
+
+}
+
+int ai_evaluate_game()
+{
+
+}
+
+int ai_max(int depth)
+{
+
+}
+
+int ai_min(int depth)
 {
 
 }
