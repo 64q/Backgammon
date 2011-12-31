@@ -267,7 +267,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	position.x= 1430;
 	position.y= 40;
 	
-	if(e_state->typeP1 == IA)
+	if(e_state->player_1.type == IA)
 	{
 		SDL_BlitSurface(d_manager->icone_ia, NULL, d_manager->backBuffer, &(position));
 	}else
@@ -278,7 +278,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	/* Ecriture du nom et du score du P1 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
 	position.y= 40;
-    texte = TTF_RenderUTF8_Blended(d_manager->font, e_state->nameP1, noir );
+    texte = TTF_RenderUTF8_Blended(d_manager->font, e_state->player_1.name, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
 	position.x= 1515+20;
@@ -293,7 +293,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	position.x= 1430;
 	position.y= 755;
 	
-	if(e_state->typeP2 == IA)
+	if(e_state->player_2.type == IA)
 	{
 		SDL_BlitSurface(d_manager->icone_ia, NULL, d_manager->backBuffer, &(position));
 	}else
@@ -304,7 +304,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	/* Ecriture du nom et du score du P2 dans la SDL_Surface "texte" en mode Blended (optimal) */
 	position.x= 1515+5;
 	position.y= 755;
-    texte = TTF_RenderUTF8_Blended(d_manager->font, e_state->nameP2, noir );
+    texte = TTF_RenderUTF8_Blended(d_manager->font, e_state->player_2.name, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
 	position.x= 1515+20;

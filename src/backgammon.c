@@ -13,7 +13,7 @@
 
 int main(int argc, char *argv[])
 {
-	void *lib;
+	
 
 	// Vérification des args de la ligne de commande
 	if (argc < 2)
@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 
 	display_manager d_manager;
 	init_display(&d_manager, "./styles/quentin/");
-
 	
 	engine_state e_state;
 	init_engine(&e_state,"Erwan", HUMAN, "", "Ordi", IA, "./lib/libai.so");
@@ -40,6 +39,7 @@ int main(int argc, char *argv[])
 	
 	while (e_state.run)
 	{
+		
 		interface_display(&d_manager, &e_state);
 
 		
