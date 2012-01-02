@@ -21,11 +21,11 @@ typedef struct
 	ai_move moves[4];
 	int bonus;
 	int penalty;
-} ai_chained_move;
+} ai_chained_moves;
 
 // Définition des variables locales
 char ai_name[50];
-ai_chained_move ai_moves[AI_MAX_MOVES];
+ai_chained_moves ai_moves[AI_MAX_MOVES];
 SGameState* ai_game_state;
 unsigned int ai_target_score;
 
@@ -40,7 +40,7 @@ void ai_play();
 /**
  * Simulation des coups de l'IA
  */
-void ai_simulate(ai_move move);
+void ai_simulate(ai_chained_moves *ch_moves, int position, int *dice, int moves)
 
 /**
  * Evaluer une configuration de jeu
@@ -50,7 +50,12 @@ int ai_evaluate_game();
 /**
  * Annuler un coup fictif sur le plateau
  */
-void ai_cancel();
+void ai_cancel(ai_chained_moves *ch_moves);
+
+/**
+ * Initialiser les variables
+ */
+void ai_init_vars();
 
 // Initialise la librairie
 void InitLibrary(char name[50])
@@ -61,18 +66,6 @@ void InitLibrary(char name[50])
 // Permet d'initialiser l'IA pour un match
 void StartMatch(const unsigned int target_score)
 {
-	// Init ai_moves struct
-	for (int i = 0; i < AI_MAX_MOVES; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{	
-			ai_moves[i].moves[j].src = -1;
-			ai_moves[i].moves[j].dest = -1;
-			ai_moves[i].bonus = 0;
-			ai_moves[i].penalty = 0;
-		}
-	}
-	
 	// Init vars
 	ai_target_score = target_score;
 }
@@ -80,7 +73,7 @@ void StartMatch(const unsigned int target_score)
 // Initialiser l'IA pour une partie
 void StartGame()
 {
-
+	
 }
 
 // Fin d'une partie
@@ -112,6 +105,8 @@ void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned i
 {
 	ai_game_state = gameState;
 	
+	ai_init_vars();
+	
 	// 1ère étape, vérifier les pions dans la barre
 	
 	// 2nde étape, vérifier si on doit rentrer les pions
@@ -119,45 +114,69 @@ void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned i
 	// 3ème étape, jouer normalement
 }
 
-void ai_play(int *dice, int moves)
+void ai_init_vars()
 {
-	int max = -1000;
-	int moves = 2;
-	int dice[4] = {ai_game_state->dice1, ai_game_state->dice2, 0, 0};
-	
-	ai_move move;
-	
-	if (ai_game_state->dice1 == ai_game_state->dice2)
+	// Init ai_moves struct
+	for (int i = 0; i < AI_MAX_MOVES; i++)
 	{
-		moves = 4;
-		dice[2] = ai_game_state->dice1;
-		dice[3] = ai_game_state->dice1;
+		for (int j = 0; j < 4; j++)
+		{	
+			ai_moves[i].moves[j].src = -1;
+			ai_moves[i].moves[j].dest = -1;
+		}
+		
+		ai_moves[i].bonus = 0;
+		ai_moves[i].penalty = 0;
 	}
 	
-	// Etablissement de tous les coups possibles
-	for (int i = 0; i < moves; i++)
+	ai_curr_index = 0;
+}
+
+void ai_play(int *dice, int moves)
+{
+	int moves = 2;
+	int dice[4] = {ai_game_state->die1, ai_game_state->die2, 0, 0};
+	
+	ai_chained_moves ch_moves;
+	
+	// En cas de doublé on modifie en conséquence
+	if (ai_game_state->die1 == ai_game_state->die2)
 	{
-		for (int j = EPos_24; j <= EPos_1; j--)
+		moves = 4;
+		dice[2] = ai_game_state->die1;
+		dice[3] = ai_game_state->die1;
+	}		
+	
+	for (int j = EPos_24; j <= EPos_1; j--)
+	{
+		// L'IA est considéré comme J1
+		if (ai_game_state->zones[j].player == EPlayer1)
 		{
-			// L'IA est considéré comme J1
-			if (ai_game_state->zones[j].player == EPlayer1)
-			{
-				if (ai_game_state->zones[j - dice[i]].nb_checkers <= 0 || ai_game_state->zones[j - dice[i]].player == EPlayer1)
-				{
-					move.src = j;
-					move.dest = j - dice[i];
-					ai_simulate(move);
-				}	
-			}
+			ai_init_chained_struct(&ch_moves);
+			ai_simulate(ch_moves, j, dice, moves);
 		}
 	}
 }
 
-void ai_simulate(ai_move **moves, int moves)
+void ai_simulate(ai_chained_moves *ch_moves, int position, int *dice, int moves)
 {
-	if (moves == 0)
+	int src = position, dest = position - dice[4 - moves]	
+	
+	if (moves != 0)
 	{
-		
+		if (ai_game_state->zones[dest].nb_checkers <= 0 || ai_game_state->zones[dest].player == EPlayer1)
+		{
+			ch_moves->moves[4 - moves].src = src;
+			ch_moves->moves[4 - moves].dest = dest;
+			
+			// Modification de la struct des zones
+			ai_game_state->zones[src].nb_checkers = ai_game_state->zones[src].nb_checkers - 1;
+			ai_game_state->zones[dest].nb_checkers = ai_game_state->zones[dest].nb_checkers + 1;
+			ai_game_state->zones[dest].player = EPlayer1;
+			
+			// Rappel de la fonction de simulation sur le jeu modifié
+			ai_simulate(ch_moves, 
+		}
 	}
 }
 
@@ -166,18 +185,20 @@ int ai_evaluate_game()
 
 }
 
-int ai_max(int depth)
+void ai_cancel(ai_chained_moves *ch_moves)
 {
 
 }
 
-int ai_min(int depth)
+void ai_init_chained_struct(ai_chained_moves *ch_moves)
 {
-
-}
-
-void ai_cancel()
-{
-
+	ch_moves->bonus = 0;
+	ch_moves->penalty = 0;
+	
+	for (int i = 0; i < 4; i++)
+	{
+		ch_moves->moves[i].src = -1;
+		ch_moves->moves[i].dest = -1;
+	}
 }
 
