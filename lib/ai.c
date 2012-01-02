@@ -10,14 +10,22 @@
 #define AI_MAX_MOVES 50
 
 // Définition des structures locales
-typedef struct {
+typedef struct 
+{
 	int src;
 	int dest;
 } ai_move;
 
+typedef struct 
+{
+	ai_move moves[4];
+	int bonus;
+	int penalty;
+} ai_chained_move;
+
 // Définition des variables locales
 char ai_name[50];
-ai_move ai_moves[AI_MAX_MOVES];
+ai_chained_move ai_moves[AI_MAX_MOVES];
 SGameState* ai_game_state;
 unsigned int ai_target_score;
 
@@ -30,7 +38,7 @@ unsigned int ai_target_score;
 void ai_play();
 
 /**
- * Simulation d'un coup de l'IA
+ * Simulation des coups de l'IA
  */
 void ai_simulate(ai_move move);
 
@@ -38,16 +46,6 @@ void ai_simulate(ai_move move);
  * Evaluer une configuration de jeu
  */
 int ai_evaluate_game();
-
-/**
- * Max function
- */
-int ai_max(int depth);
-
-/**
- * Min function
- */
-int ai_min(int depth);
 
 /**
  * Annuler un coup fictif sur le plateau
@@ -66,8 +64,13 @@ void StartMatch(const unsigned int target_score)
 	// Init ai_moves struct
 	for (int i = 0; i < AI_MAX_MOVES; i++)
 	{
-			ai_moves[i].src = -1;
-			ai_moves[i].dest = -1;
+		for (int j = 0; j < 4; j++)
+		{	
+			ai_moves[i].moves[j].src = -1;
+			ai_moves[i].moves[j].dest = -1;
+			ai_moves[i].bonus = 0;
+			ai_moves[i].penalty = 0;
+		}
 	}
 	
 	// Init vars
@@ -150,9 +153,12 @@ void ai_play(int *dice, int moves)
 	}
 }
 
-void ai_simulate(ai_move move)
+void ai_simulate(ai_move **moves, int moves)
 {
-
+	if (moves == 0)
+	{
+		
+	}
 }
 
 int ai_evaluate_game()
