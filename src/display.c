@@ -47,7 +47,7 @@ void init_display(display_manager* d_manager ,char* path_img)
 	/* Chargement de la police */
 	strcpy(path_img_cp, path_img);
 	strcat(path_img_cp, "font.ttf");
-    d_manager->font = TTF_OpenFont(path_img_cp, 70);
+    	d_manager->font = TTF_OpenFont(path_img_cp, 70);
     
 	
 	//chargement des images
