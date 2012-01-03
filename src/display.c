@@ -184,7 +184,7 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 		if(g_state->zones[i].nb_checkers > 5)
 		{
 			checker_position.x += 22;
-			checker_position.y += 113;
+			checker_position.y -= 90;
 			sprintf(checker_number, "%i", g_state->zones[i].nb_checkers);
 			texte = TTF_RenderText_Blended(d_manager->font, checker_number, noir );
 			SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(checker_position));
@@ -211,7 +211,7 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 		if(g_state->zones[i].nb_checkers > 5)
 		{
 			checker_position.x += 22;
-			checker_position.y += 113;
+			checker_position.y -= 90;
 			sprintf(checker_number, "%i", g_state->zones[i].nb_checkers);
 			texte = TTF_RenderText_Blended(d_manager->font, checker_number, noir );
 			SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(checker_position));

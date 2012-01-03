@@ -345,6 +345,36 @@ void copy_game_state(SGameState* g_state_cpy, SGameState* g_state)
 	g_state_cpy->stake = g_state->stake;
 }
 
+void copy_reversed_game_state(SGameState* g_state_cpy, SGameState* g_state)
+{
+	for(int i = 0; i < 24; i++)
+	{
+		g_state_cpy->zones[i].player = g_state->zones[23 - i].player;
+		g_state_cpy->zones[i].nb_checkers = g_state->zones[23 - i].nb_checkers;
+	}
+	
+	g_state_cpy->zones[EPos_OutP1].player = g_state->zones[EPos_OutP2].player;
+	g_state_cpy->zones[EPos_OutP1].nb_checkers =g_state->zones[EPos_OutP2].nb_checkers;
+	
+	g_state_cpy->zones[EPos_OutP2].player = g_state->zones[EPos_OutP1].player;
+	g_state_cpy->zones[EPos_OutP2].nb_checkers =g_state->zones[EPos_OutP1].nb_checkers;
+	
+	
+	g_state_cpy->zones[EPos_BarP1].player = g_state->zones[EPos_BarP2].player;
+	g_state_cpy->zones[EPos_BarP1].nb_checkers =g_state->zones[EPos_BarP2].nb_checkers;
+	
+	g_state_cpy->zones[EPos_BarP2].player = g_state->zones[EPos_BarP1].player;
+	g_state_cpy->zones[EPos_BarP2].nb_checkers =g_state->zones[EPos_BarP1].nb_checkers;
+	
+	g_state_cpy->die1 = g_state->die1;
+	g_state_cpy->die2 = g_state->die2;
+	
+	g_state_cpy->score = g_state->scoreP2;
+	g_state_cpy->scoreP2 = g_state->score;
+	
+	g_state_cpy->stake = g_state->stake;
+}
+
 void double_stack(engine_state* e_state)
 {
 	e_state->g_state.stake *= 2;

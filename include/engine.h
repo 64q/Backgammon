@@ -93,6 +93,7 @@ void first_to_play(engine_state* e_state);
 void load_functions_IA(functions* ptr_functions, void* lib);
 void start_game(engine_state* e_state);
 void copy_game_state(SGameState* g_state_cpy, SGameState* g_state);
+void copy_reversed_game_state(SGameState* g_state_cpy, SGameState* g_state);
 void play_turn(engine_state* e_state, player* active_player, player* opponent);
 
 void double_stack(engine_state* e_state);
