@@ -47,7 +47,7 @@ void init_display(display_manager* d_manager ,char* path_img)
 	/* Chargement de la police */
 	strcpy(path_img_cp, path_img);
 	strcat(path_img_cp, "font.ttf");
-    d_manager->font = TTF_OpenFont(path_img_cp, 70);
+    	d_manager->font = TTF_OpenFont(path_img_cp, 70);
     
 	
 	//chargement des images
@@ -71,7 +71,10 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	//on blit tout dans le backbuffer en full hd
 	
 	//background
-	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(d_manager->background_position));
+	SDL_Rect pos;
+	pos.x = 0;
+	pos.y = 0;
+	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(pos));
 	//pions
 	checker_display(d_manager, &(e_state->g_state));
 	//nom + score
@@ -548,26 +551,29 @@ void free_surface(display_manager* d_manager)
 }
 
 void switch_to_full_screen(display_manager* d_manager)
+
 {
 	if(d_manager->display_mode != FULL_SCREEN)
 	{
 		d_manager->ratio = (double)d_manager->res_max[0]/(double)d_manager->background->w;
-
 		d_manager->screen = SDL_SetVideoMode(d_manager->res_max[0], d_manager->res_max[1], 32, SDL_FULLSCREEN|SDL_DOUBLEBUF);
 		d_manager->display_mode = FULL_SCREEN;
+		d_manager->background_position.y = (int) (d_manager->res_max[1]/2.0 - (d_manager->res_max[0]*9.0/16.0)/2.0);
 	}
 }
 
+
+
 void switch_to_window(display_manager* d_manager)
+
 {
 	if(d_manager->display_mode != WINDOW)
 	{
-		
 		d_manager->ratio = (double)d_manager->window_mode_width/(double)d_manager->background->w;
-
 		//on passe en plein écran
 		d_manager->screen = SDL_SetVideoMode(d_manager->window_mode_width, d_manager->window_mode_width*9/16, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 		d_manager->display_mode = WINDOW;
+		d_manager->background_position.y = 0;
 	}
 }
 

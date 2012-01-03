@@ -8,31 +8,54 @@
 #include "ai.h"
 
 #define AI_MAX_MOVES 50
-// Les bonus
-#define AI_BON_SECURE 2
-#define AI_BON_TAKE 1
-#define AI_BON_MOVE 0
-// Les pénalités
-#define AI_PEN_NO 0
-#define AI_PEN_ALONE 1
 
 // Définition des structures locales
-typedef struct {
+typedef struct 
+{
 	int src;
 	int dest;
+} ai_move;
+
+typedef struct 
+{
+	ai_move moves[4];
 	int bonus;
 	int penalty;
-} ai_move;
+} ai_chained_moves;
 
 // Définition des variables locales
 char ai_name[50];
-ai_move ai_moves[AI_MAX_MOVES];
+ai_chained_moves ai_moves[AI_MAX_MOVES];
 SGameState* ai_game_state;
 unsigned int ai_target_score;
 
+// ----------------------------------
 // Définition des fonctions locales
-void ai_update_moves();
-int validate_move(const SGameState * const gameState, ai_move move);
+
+/**
+ * Faire jouer l'IA de manière virtuelle
+ */
+void ai_play();
+
+/**
+ * Simulation des coups de l'IA
+ */
+void ai_simulate(ai_chained_moves *ch_moves, int position, int *dice, int moves)
+
+/**
+ * Evaluer une configuration de jeu
+ */
+int ai_evaluate_game();
+
+/**
+ * Annuler un coup fictif sur le plateau
+ */
+void ai_cancel(ai_chained_moves *ch_moves);
+
+/**
+ * Initialiser les variables
+ */
+void ai_init_vars();
 
 // Initialise la librairie
 void InitLibrary(char name[50])
@@ -43,15 +66,6 @@ void InitLibrary(char name[50])
 // Permet d'initialiser l'IA pour un match
 void StartMatch(const unsigned int target_score)
 {
-	// Init ai_moves struct
-	for (int i = 0; i < AI_MAX_MOVES; i++)
-	{
-			ai_moves[i].src = -1;
-			ai_moves[i].dest = -1;
-			ai_moves[i].bonus = 0;
-			ai_moves[i].penalty = 0;
-	}
-	
 	// Init vars
 	ai_target_score = target_score;
 }
@@ -59,7 +73,7 @@ void StartMatch(const unsigned int target_score)
 // Initialiser l'IA pour une partie
 void StartGame()
 {
-
+	
 }
 
 // Fin d'une partie
@@ -83,87 +97,108 @@ int DoubleStack(const SGameState * const gameState)
 // Prendre un doublage
 int TakeDouble(const SGameState * const gameState)
 {
-	return 0;
+	return 1;
 }
 
 // Retourner une liste de mouvements
 void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned int lastTimeError)
 {
 	ai_game_state = gameState;
+	
+	ai_init_vars();
+	
+	// 1ère étape, vérifier les pions dans la barre
+	
+	// 2nde étape, vérifier si on doit rentrer les pions
+	
+	// 3ème étape, jouer normalement
 }
 
-// -----------------
-int empty_bar()
+void ai_init_vars()
 {
-	return ai_game_state->zones[EPos_BarP1] == 0;
+	// Init ai_moves struct
+	for (int i = 0; i < AI_MAX_MOVES; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{	
+			ai_moves[i].moves[j].src = -1;
+			ai_moves[i].moves[j].dest = -1;
+		}
+		
+		ai_moves[i].bonus = 0;
+		ai_moves[i].penalty = 0;
+	}
+	
+	ai_curr_index = 0;
 }
 
-// Fonctions perso
-void ai_update_moves()
+void ai_play(int *dice, int moves)
 {
-	int curr = 0, is_movable = 0;
+	int moves = 2;
 	int dice[4] = {ai_game_state->die1, ai_game_state->die2, 0, 0};
 	
+	ai_chained_moves ch_moves;
+	
+	// En cas de doublé on modifie en conséquence
 	if (ai_game_state->die1 == ai_game_state->die2)
 	{
+		moves = 4;
 		dice[2] = ai_game_state->die1;
 		dice[3] = ai_game_state->die1;
-	}
+	}		
 	
-	// Parcourt des pions prisonniers
-	if (!empty_bar())
+	for (int j = EPos_24; j <= EPos_1; j--)
 	{
-		
-	}
-	
-	// Parcourt du plateau de jeu
-	for (unsigned int i = EPos_24; i <= EPos_1; i--)
-	{
-		for (unsigned int j = 0; j < 2; j++)
+		// L'IA est considéré comme J1
+		if (ai_game_state->zones[j].player == EPlayer1)
 		{
-			if (ai_game_state->zones[i].player == EPlayer1 && ai_game_state->zones[i].nb_checkers > 0)
-			{
-				// Listons à présent les mouvements possible depuis la case i
-				// Dé 1
-				if (ai_game_state->zones[i - dice[j]].player == EPlayer2 && ai_game_state->zones[i - dice[j]].nb_checkers <= 1)
-				{
-					ai_moves[curr].src = i;
-					ai_moves[curr].dest = i - dice[j];
-					ai_moves[curr].bonus = AI_BON_MOVE;
-				
-					is_movable = 1;
-				}
-				else if (ai_game_state->zones[i - dice[j]].player == EPlayer1)
-				{
-					ai_moves[curr].src = i;
-					ai_moves[curr].dest = i - dice[j];
-				
-					is_movable = 1;
-				}
-			
-				// Si deplacement possible, calcul de la pénalité de move
-				if (is_movable)
-				{
-					// Mouvement risqué, ajout d'une pénalité
-					if (ai_game_state->zones[i].nb_checkers == 2)
-					{
-						ai_moves[curr].penalty = AI_PEN_ALONE;
-					}
-					else if ((ai_game_state->zones[i - dice[j]].nb_checkers + 1) >= 2)
-					{
-						ai_moves[curr].bonus += AI_BON_SECURE;
-					} 
-				
-					is_movable = 0;
-					curr = curr + 1;
-				}
-			}
+			ai_init_chained_struct(&ch_moves);
+			ai_simulate(ch_moves, j, dice, moves);
 		}
 	}
 }
 
-int validate_move(const SGameState * const gameState, ai_move move)
+void ai_simulate(ai_chained_moves *ch_moves, int position, int *dice, int moves)
+{
+	int src = position, dest = position - dice[4 - moves]	
+	
+	if (moves != 0)
+	{
+		if (ai_game_state->zones[dest].nb_checkers <= 0 || ai_game_state->zones[dest].player == EPlayer1)
+		{
+			ch_moves->moves[4 - moves].src = src;
+			ch_moves->moves[4 - moves].dest = dest;
+			
+			// Modification de la struct des zones
+			ai_game_state->zones[src].nb_checkers = ai_game_state->zones[src].nb_checkers - 1;
+			ai_game_state->zones[dest].nb_checkers = ai_game_state->zones[dest].nb_checkers + 1;
+			ai_game_state->zones[dest].player = EPlayer1;
+			
+			// Rappel de la fonction de simulation sur le jeu modifié
+			ai_simulate(ch_moves, 
+		}
+	}
+}
+
+int ai_evaluate_game()
 {
 
+}
+
+void ai_cancel(ai_chained_moves *ch_moves)
+{
+
+}
+
+void ai_init_chained_struct(ai_chained_moves *ch_moves)
+{
+	ch_moves->bonus = 0;
+	ch_moves->penalty = 0;
+	
+	for (int i = 0; i < 4; i++)
+	{
+		ch_moves->moves[i].src = -1;
+		ch_moves->moves[i].dest = -1;
+	}
 }
 
