@@ -27,14 +27,13 @@ int main(int argc, char *argv[])
 	int delay = 1000/fps;
 
 	display_manager d_manager;
-	init_display(&d_manager, "./styles/quentin/");
+	init_display(&d_manager, "./styles/default/");
 	
 	engine_state e_state;
-	init_engine(&e_state,"Erwan", HUMAN, "", "Ordi", IA, "./lib/libai.so");
+	init_engine(&e_state,"Erwan", IA, "./lib/libai.so", "Ordi", IA, "./lib/libai.so");
 	SGameState tmp;
 	
-	e_state.g_state.zones[EPos_15].nb_checkers = 12;
-	e_state.g_state.zones[EPos_15].player = EPlayer2;
+	
 	
 	
 
@@ -62,9 +61,8 @@ int main(int argc, char *argv[])
 					}
 					if (keystates[SDLK_RIGHT]) 
 					{ 
-						//switch_to_window(&d_manager);
-						copy_reversed_game_state(&(tmp), &(e_state.g_state));
-						copy_game_state(&(e_state.g_state), &(tmp));
+						switch_to_window(&d_manager);
+						
 					}
 					if (keystates[SDLK_UP]) 
 					{ 

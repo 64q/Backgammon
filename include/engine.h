@@ -43,6 +43,7 @@ typedef struct player
 	char name[50];
 	int type; //IA ou HUMAN
 	functions functions;
+	EPlayer number;
 }player;
 
 
@@ -62,9 +63,15 @@ typedef struct engine_state
 	
 	bool run;
 	
-	int score_to_reach;
+	unsigned int score_to_reach;
 	
-	int stake_owner;
+	EPlayer stake_owner;
+	
+	SMove current_moves[4];
+	int nb_current_moves;
+	
+	player* current_player;
+	player* pending_player;
 
 }engine_state;
 
@@ -97,4 +104,11 @@ void copy_reversed_game_state(SGameState* g_state_cpy, SGameState* g_state);
 void play_turn(engine_state* e_state, player* active_player, player* opponent);
 
 void double_stack(engine_state* e_state);
+int moves_valid(SMove moves[4]);
+void copy_moves(SMove cpy[4], SMove original[4]);
+
+void make_moves(engine_state* e_state);
+void give_up(engine_state* e_state);
+void current_player_win_game(engine_state* e_state);
 #endif
+

@@ -47,7 +47,7 @@ void init_display(display_manager* d_manager ,char* path_img)
 	/* Chargement de la police */
 	strcpy(path_img_cp, path_img);
 	strcat(path_img_cp, "font.ttf");
-    	d_manager->font = TTF_OpenFont(path_img_cp, 70);
+	d_manager->font = TTF_OpenFont(path_img_cp, 70);
     
 	
 	//chargement des images
@@ -90,6 +90,40 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 			die_display(d_manager, e_state->g_state.die2, 1745, 500);
 		}
 	}
+	
+	if(e_state->stake_owner == EPlayer1 + EPlayer2)
+	{
+		pos.x = 613;
+		pos.y = 508;
+	}
+	else if(e_state->stake_owner == EPlayer1)
+	{
+		pos.x = 613;
+		pos.y = 56;
+	}
+	else
+	{
+		pos.x = 613;
+		pos.y = 960;
+	}
+	
+	SDL_BlitSurface(d_manager->stake, NULL, d_manager->backBuffer, &pos);
+	char stake_str[6];
+	SDL_Color noir;
+	noir.r = 0;
+	noir.g = 0;
+	noir.b = 0;
+	
+	
+	int stake_tmp = e_state->g_state.stake;
+	if(e_state->g_state.stake == 1)
+		stake_tmp = 64;
+	
+		sprintf(stake_str, "%i", stake_tmp);
+	SDL_Surface * texte = TTF_RenderText_Blended(d_manager->font,stake_str , noir );
+	pos.x = 645 - texte->w / 2;
+	pos.y = pos.y + 32 - texte->h / 2;
+	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(pos));
 	
 	//messages
 	messages_display(d_manager, e_state);
@@ -562,8 +596,6 @@ void switch_to_full_screen(display_manager* d_manager)
 	}
 }
 
-
-
 void switch_to_window(display_manager* d_manager)
 
 {
@@ -576,7 +608,6 @@ void switch_to_window(display_manager* d_manager)
 		d_manager->background_position.y = 0;
 	}
 }
-
 
 void load_images(display_manager* d_manager)
 {
@@ -626,6 +657,11 @@ void load_images(display_manager* d_manager)
 	
 	//sprite des dés
 	strcpy(path_img_cp, d_manager->path_img);
+	strcat(path_img_cp, "stake.png");
+	d_manager->stake = IMG_Load(path_img_cp);
+	
+	//sprite des dés
+	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "message_border.png");
 	d_manager->message_border = IMG_Load(path_img_cp);
 	
@@ -635,5 +671,6 @@ void load_images(display_manager* d_manager)
 	d_manager->message_border_clicked = IMG_Load(path_img_cp);
 }
 
-
+//ajouter une fonction qui affiche les pions qui peuvent bouger
+//seulement si le joueur courant est humain
 

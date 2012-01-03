@@ -12,6 +12,8 @@
 #define FULL_SCREEN 2
 #define WIN_NAME "Backgammon"
 
+
+
 typedef struct display_manager
 {
 	//contiendra le contenu de la fenetre
@@ -30,6 +32,8 @@ typedef struct display_manager
 	SDL_Surface *icone_human;
 	
 	SDL_Surface *dice;
+	
+	SDL_Surface *stake;
 	
 	SDL_Surface *message_border;
 	SDL_Surface *message_border_clicked;
