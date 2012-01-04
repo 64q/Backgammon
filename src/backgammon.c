@@ -27,11 +27,11 @@ int main(int argc, char *argv[])
 	int delay = 1000/fps;
 
 	display_manager d_manager;
-	init_display(&d_manager, "./styles/default/");
+	init_display(&d_manager, "./styles/quentin/");
 	
 	engine_state e_state;
 	init_engine(&e_state,"Erwan", IA, "./lib/libai.so", "Ordi", IA, "./lib/libai.so");
-	SGameState tmp;
+	
 	
 	
 	

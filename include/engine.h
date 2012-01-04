@@ -72,6 +72,12 @@ typedef struct engine_state
 	
 	player* current_player;
 	player* pending_player;
+	
+	SMove *(current_possible_moves[4]);
+	int current_move_number;
+	int src_selected_checker;
+	
+	int nb_error_IA;
 
 }engine_state;
 
@@ -110,5 +116,6 @@ void copy_moves(SMove cpy[4], SMove original[4]);
 void make_moves(engine_state* e_state);
 void give_up(engine_state* e_state);
 void current_player_win_game(engine_state* e_state);
+int get_selected_checker(SGameState* g_state);
 #endif
 

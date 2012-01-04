@@ -58,6 +58,7 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 	e_state->score_to_reach = 3;
 	e_state->stake_owner = EPlayer1 + EPlayer2; //2 ne correspond ni a EPlayer1 ni EPlayer2
 	e_state->nb_current_moves = 0;
+	e_state->nb_error_IA = 0;
 	init_game( &(e_state->g_state) );
 	
 	srand(time(NULL));
@@ -196,6 +197,14 @@ void on_click_listener(engine_state* e_state, double ratio)
 	
 	//rajouter la partie :
 	//si le joueur courant est humain, si il clic sur un pion autorisé, on enregistre le pion en cours de transport ainsi que d'où il vient
+	if( e_state->current_player->type == HUMAN &&  e_state->src_selected_checker == -1)
+	{
+		int res = get_selected_checker(&(e_state->g_state));
+		if(res != -1 )
+		{
+			e_state->src_selected_checker = res;
+		}
+	}
 }
 void on_unclick_listener(engine_state* e_state, double ratio)
 {
@@ -314,18 +323,26 @@ void first_to_play(engine_state* e_state)
 		
 		if( current_player->type == IA )
 		{
-			int nb_decisions = 0;
+			
 			SMove moves[4];
 			SGameState g_state_cpy;
-			copy_game_state(&g_state_cpy, &(e_state->g_state) );
+			if(e_state->current_player->type == EPlayer1)
+			{
+				//le joueur 1 étant celui quiva de la case 1 à 24 pour l'arbitre, il faut inverser les places car l'IA fait bouger les pions de 24 à 1
+				copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
+			}
+			else
+			{
+				copy_game_state(&g_state_cpy, &(e_state->g_state) );
+			}
 			
 			current_player->functions.make_decision(&g_state_cpy, moves, false);
-			nb_decisions = 1;
 			
-			while(!moves_valid(moves) && nb_decisions < 3)
+			
+			while(!moves_valid(moves) && e_state->nb_error_IA < 3)
 			{
 				current_player->functions.make_decision(&g_state_cpy, moves, true);
-				nb_decisions++;
+				e_state->nb_error_IA++;
 			}
 			
 			if(moves_valid(moves))
@@ -364,6 +381,9 @@ void first_to_play(engine_state* e_state)
 				sprintf(tmp, "%s\ns'est trompé\ntrois fois!", current_player->name);
 				add_message(e_state,tmp, 700, 455, 520, 300, give_up);
 			}
+		}else
+		{
+			e_state->current_move_number = 0;
 		}
 	}
 }
@@ -396,7 +416,15 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 		throw_dice(e_state);
 		
 		SGameState g_state_cpy;
-		copy_game_state(&g_state_cpy, &(e_state->g_state) );
+		if(active_player->type == EPlayer1)
+		{
+			copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
+		}
+		else
+		{
+			copy_game_state(&g_state_cpy, &(e_state->g_state) );
+		}
+		
 		
 		//débat sur le doublement de la mise
 		if( active_player->number == e_state->stake_owner)
@@ -405,7 +433,14 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			{
 				if( opponent->type == IA )
 				{
-					copy_game_state(&g_state_cpy, &(e_state->g_state) );
+					if(active_player->type == EPlayer1)
+					{
+						copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
+					}
+					else
+					{
+						copy_game_state(&g_state_cpy, &(e_state->g_state) );
+					}
 					if( opponent->functions.take_double(&g_state_cpy) )
 					{
 						double_stack(e_state);
@@ -425,16 +460,23 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			}
 		}
 		
-		int nb_decisions = 0;
+		
 		SMove moves[4];
-		copy_game_state(&g_state_cpy, &(e_state->g_state) );
+		if(active_player->type == EPlayer1)
+		{
+			copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
+		}
+		else
+		{
+			copy_game_state(&g_state_cpy, &(e_state->g_state) );
+		}
 		active_player->functions.make_decision(&g_state_cpy, moves, false);
 		
 		
-		while(!moves_valid(moves) && nb_decisions < 3)
+		while(!moves_valid(moves) && e_state->nb_error_IA < 3)
 		{
 			active_player->functions.make_decision(&g_state_cpy, moves, true);
-			nb_decisions++;
+			e_state->nb_error_IA ++;
 		}
 		
 		if(moves_valid(moves))
@@ -462,6 +504,10 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			e_state->current_player = opponent;
 			add_message(e_state,tmp, 700, 455, 520, 300, current_player_win_game);
 		}
+	}
+	else
+	{
+		e_state->current_move_number = 0;
 	}
 }
 
@@ -606,7 +652,7 @@ void current_player_win_game(engine_state* e_state)
 	add_message(e_state,tmp, 700, 255, 520, 300, start_game);
 }
 
-
+int get_selected_checker(SGameState* g_state){};
 
 
 

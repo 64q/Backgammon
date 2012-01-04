@@ -16,6 +16,9 @@ void init_display(display_manager* d_manager ,char* path_img)
 	//position du fond
 	d_manager->background_position.x = 0;
 	d_manager->background_position.y = 0;
+	
+	d_manager->moving_checker_pos.x = -1;
+	d_manager->moving_checker_pos.y = -1;
 
 	//initialiser SDL
 	atexit(SDL_Quit);
@@ -75,6 +78,12 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	pos.x = 0;
 	pos.y = 0;
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(pos));
+	
+	if(e_state->current_player->type == HUMAN)
+	{
+		highlight_possible_moves(d_manager, e_state);
+	}
+	
 	//pions
 	checker_display(d_manager, &(e_state->g_state));
 	//nom + score
@@ -91,39 +100,8 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 		}
 	}
 	
-	if(e_state->stake_owner == EPlayer1 + EPlayer2)
-	{
-		pos.x = 613;
-		pos.y = 508;
-	}
-	else if(e_state->stake_owner == EPlayer1)
-	{
-		pos.x = 613;
-		pos.y = 56;
-	}
-	else
-	{
-		pos.x = 613;
-		pos.y = 960;
-	}
-	
-	SDL_BlitSurface(d_manager->stake, NULL, d_manager->backBuffer, &pos);
-	char stake_str[6];
-	SDL_Color noir;
-	noir.r = 0;
-	noir.g = 0;
-	noir.b = 0;
-	
-	
-	int stake_tmp = e_state->g_state.stake;
-	if(e_state->g_state.stake == 1)
-		stake_tmp = 64;
-	
-		sprintf(stake_str, "%i", stake_tmp);
-	SDL_Surface * texte = TTF_RenderText_Blended(d_manager->font,stake_str , noir );
-	pos.x = 645 - texte->w / 2;
-	pos.y = pos.y + 32 - texte->h / 2;
-	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(pos));
+	//mise
+	stake_display(d_manager, e_state);
 	
 	//messages
 	messages_display(d_manager, e_state);
@@ -566,6 +544,58 @@ void messages_display(display_manager *d_manager, engine_state* e_state)
 	}
 }
 
+void stake_display(display_manager *d_manager, engine_state* e_state)
+{
+	SDL_Rect pos;
+	pos.x = 0;
+	pos.y = 0;
+	if(e_state->stake_owner == EPlayer1 + EPlayer2)
+	{
+		pos.x = 613;
+		pos.y = 508;
+	}
+	else if(e_state->stake_owner == EPlayer1)
+	{
+		pos.x = 613;
+		pos.y = 56;
+	}
+	else
+	{
+		pos.x = 613;
+		pos.y = 960;
+	}
+	
+	SDL_BlitSurface(d_manager->stake, NULL, d_manager->backBuffer, &pos);
+	char stake_str[6];
+	SDL_Color noir;
+	noir.r = 0;
+	noir.g = 0;
+	noir.b = 0;
+	
+	
+	int stake_tmp = e_state->g_state.stake;
+	if(e_state->g_state.stake == 1)
+		stake_tmp = 64;
+	
+		sprintf(stake_str, "%i", stake_tmp);
+	SDL_Surface * texte = TTF_RenderText_Blended(d_manager->font,stake_str , noir );
+	pos.x = 645 - texte->w / 2;
+	pos.y = pos.y + 32 - texte->h / 2;
+	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(pos));
+}
+
+void highlight_possible_moves(display_manager *d_manager, engine_state* e_state)
+{
+// 	int i = 0;
+// 	while( e_state->current_possible_moves[i] != NULL)
+// 	{
+// 		if(moving_checker_pos.x == -1)
+// 		{
+// 			
+// 		}
+// 		i++;
+// 	}
+}
 void free_surface(display_manager* d_manager)
 {
     SDL_FreeSurface(d_manager->background);
@@ -585,7 +615,6 @@ void free_surface(display_manager* d_manager)
 }
 
 void switch_to_full_screen(display_manager* d_manager)
-
 {
 	if(d_manager->display_mode != FULL_SCREEN)
 	{
@@ -664,6 +693,11 @@ void load_images(display_manager* d_manager)
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "message_border.png");
 	d_manager->message_border = IMG_Load(path_img_cp);
+	
+	//sprite des dés
+	strcpy(path_img_cp, d_manager->path_img);
+	strcat(path_img_cp, "highlight.png");
+	d_manager->highlight = IMG_Load(path_img_cp);
 	
 	//sprite des dés
 	strcpy(path_img_cp, d_manager->path_img);

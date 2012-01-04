@@ -38,6 +38,8 @@ typedef struct display_manager
 	SDL_Surface *message_border;
 	SDL_Surface *message_border_clicked;
 	
+	SDL_Surface* highlight;
+	
 	//font
 	TTF_Font *font;
 	
@@ -59,6 +61,7 @@ typedef struct display_manager
 	//ratio entre les images (full hd) et la résoltion de la fenêtre
 	double ratio;
 	
+	SDL_Rect moving_checker_pos;
 	
 
 } display_manager;
@@ -89,6 +92,8 @@ void die_display(display_manager* d_manager, unsigned int val, int x, int y);
 
 void messages_display(display_manager *d_manager, engine_state*);
 
+void stake_display(display_manager *d_manager, engine_state* e_state);
+
 //libère les SDL_Surface
 void free_surface(display_manager*);
 
@@ -100,6 +105,8 @@ void switch_to_window(display_manager*);
 
 //charge toutes les images du jeu (private)
 void load_images(display_manager*);
+
+void highlight_possible_moves(display_manager* d_manager, engine_state* e_state);
 
 #endif
 
