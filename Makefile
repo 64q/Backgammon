@@ -27,7 +27,7 @@ ${OBJ}backgammon.o: ${SRC}backgammon.c
 	${CC} -o $@ -c $^ ${CFLAGS}
 
 # Règle pour compiler le moteur de jeu
-${OBJ}engine.o: ${SRC}engine.c
+${OBJ}engine.o: ${SRC}engine.c ${SRC}moves.c
 	${CC} -o $@ -c $^ ${CFLAGS}
 
 # Règle pour compiler l'UI
