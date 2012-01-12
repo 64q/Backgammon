@@ -38,7 +38,8 @@ typedef struct display_manager
 	SDL_Surface *message_border;
 	SDL_Surface *message_border_clicked;
 	
-	SDL_Surface* highlight;
+	SDL_Surface* highlight_up;
+	SDL_Surface* highlight_down;
 	
 	//font
 	TTF_Font *font;

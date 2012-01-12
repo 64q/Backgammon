@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 #include "backgammon.h"
+#include "moves.h"
 
 
 #define IA 1
@@ -73,21 +74,33 @@ typedef struct engine_state
 	player* current_player;
 	player* pending_player;
 	
-	SMove *(current_possible_moves[4]);
-	int current_move_number;
+	SList_moves *current_possible_moves;
+	int nb_current_possible_moves;
+	int is_human_playing;
+	
 	int src_selected_checker;
 	
 	int nb_error_IA;
+	int is_first_turn;
 
 }engine_state;
 
 typedef void (*ptr_fct_message)(engine_state*);
 
+typedef struct parametre
+{
+	char* name_player_1;
+	char*  name_player_2;
+	int type_player_1;
+	int type_player_2;
+	char *style;
 
+}parametre;
 
+void set_parametre( int argc, char *argv[], parametre* param);
 
 //initialise la structure engine_state avec le nom de chaque joueur et son type (IA ou HUMAN)
-void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib_P1, char *nameP2, int typeP2, char* path_lib_P2);
+void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, int typeP2);
 
 //initialise l'état du jeu au départ (private)
 void init_game(SGameState*);
@@ -117,5 +130,6 @@ void make_moves(engine_state* e_state);
 void give_up(engine_state* e_state);
 void current_player_win_game(engine_state* e_state);
 int get_selected_checker(SGameState* g_state);
+void throw_dice_HUMAN(engine_state* e_state);
 #endif
 

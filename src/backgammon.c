@@ -7,6 +7,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_rotozoom.h>
 // Includes persos
+
 #include "../include/engine.h"
 #include "../include/display.h"
 #include "../lib/ai.h"
@@ -14,25 +15,23 @@
 int main(int argc, char *argv[])
 {
 	
-
-	// Vérification des args de la ligne de commande
-	if (argc < 2)
-	{
-		fprintf(stderr, "usage: %s <lib_path>\n", *(argv));
-		//exit(1);
-	}
-
-
 	int fps = 60;
 	int delay = 1000/fps;
+	
+	parametre param;
+	set_parametre( argc, argv, &param);
 
+	printf("%s\n", param.style);
+	
 	display_manager d_manager;
-	init_display(&d_manager, "./styles/quentin/");
+	init_display(&d_manager, param.style);
+	
+	
 	
 	engine_state e_state;
-	init_engine(&e_state,"Erwan", IA, "./lib/libai.so", "Ordi", IA, "./lib/libai.so");
+	init_engine(&e_state,param.name_player_1 , param.type_player_1 , param.name_player_2, param.type_player_2 );
 	
-	
+
 	
 	
 	

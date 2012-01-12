@@ -7,13 +7,61 @@
 #include <dlfcn.h>
 
 // Includes persos
+
 #include "../include/backgammon.h"
 #include "../include/engine.h"
+#include "../include/moves.h"
 
-void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib_P1, char *nameP2, int typeP2, char* path_lib_P2)
+
+void set_parametre( int argc, char *argv[], parametre* param)
+{
+
+	int nb_player=0;
+
+	for (int i=0; i < argc; i++)
+	{
+		if (strcmp(argv[i],"-h")==0 && nb_player== 0)/*-h c'est humain*/
+		{
+			param->name_player_1=(char*)malloc(strlen(argv[i+1])*sizeof(char));
+			strcpy( param->name_player_1,argv[i+1]);
+			nb_player=nb_player+1;
+			param->type_player_1= HUMAN;
+			
+		}else if (strcmp(argv[i],"-h")==0 && nb_player==1)
+		{
+			param->name_player_2=(char*)malloc(strlen(argv[i+1])*sizeof(char));
+			strcpy( param->name_player_2,argv[i+1]);
+			nb_player=nb_player+1;
+			param->type_player_2= HUMAN;
+			
+		}else if (strcmp(argv[i],"-i")==0 && nb_player== 0)
+		{
+			param->name_player_1=(char*)malloc(strlen(argv[i+1])*sizeof(char));
+			strcpy( param->name_player_1,argv[i+1]);
+			nb_player=nb_player+1;
+			param->type_player_1=IA;
+			
+		}else if (strcmp(argv[i],"-i")==0 && nb_player== 1)
+		{
+			param->name_player_2=(char*)malloc(strlen(argv[i+1])*sizeof(char));
+			strcpy(param->name_player_2,argv[i+1]);
+			nb_player=nb_player+1;
+			param->type_player_2= IA;
+
+		}else if (strcmp(argv[i],"-g")==0 )
+		{
+			param->style=(char*)malloc(strlen(argv[i+1])*sizeof(char));
+			strcpy(param->style,argv[i+1]);
+		}
+
+	}
+}
+
+void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, int typeP2)
 {
 	bool load = true;
 	char error[200];
+	char tmp[100];
 	strcpy(e_state->player_1.name, nameP1);
 	
 	strcpy(e_state->player_2.name, nameP2);
@@ -29,7 +77,8 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 	void *lib;
 	if( typeP1 == IA )
 	{
-		if ((lib = dlopen(path_lib_P1, RTLD_LAZY)) == NULL)
+		sprintf(tmp, "./lib/%s.so", nameP1);
+		if ((lib = dlopen(tmp, RTLD_LAZY)) == NULL)
 		{
 			sprintf(error, "erreur dans le\n chargement\nde la librairie de \n%s", nameP1);
 			add_message(e_state,error , 550, 200, 700, 350, NULL);
@@ -42,7 +91,8 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 	
 	if( typeP2 == IA )
 	{
-		if ((lib = dlopen(path_lib_P2, RTLD_LAZY)) == NULL)
+		sprintf(tmp, "./lib/%s.so", nameP2);
+		if ((lib = dlopen(tmp, RTLD_LAZY)) == NULL)
 		{
 			sprintf(error, "erreur dans le\n chargement\nde la librairie de \n%s", nameP2);
 			add_message(e_state, error, 550, 600, 700, 350, NULL);
@@ -57,8 +107,9 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib
 	e_state->run = true;
 	e_state->score_to_reach = 3;
 	e_state->stake_owner = EPlayer1 + EPlayer2; //2 ne correspond ni a EPlayer1 ni EPlayer2
-	e_state->nb_current_moves = 0;
+	
 	e_state->nb_error_IA = 0;
+	
 	init_game( &(e_state->g_state) );
 	
 	srand(time(NULL));
@@ -304,87 +355,24 @@ void first_to_play(engine_state* e_state)
 {
 	erase_messages(e_state);
 	throw_dice(e_state);
-	char tmp[50];
+	
+	e_state->is_first_turn  = true;
 	
 	if(e_state->g_state.die1 == e_state->g_state.die2)
 	{
 		add_message(e_state,"égalité!\nrelancer le dé", 700, 455, 520, 220, first_to_play);
 	}else
 	{
-		player* current_player;
+		
 		if(e_state->g_state.die1 > e_state->g_state.die2)
 		{
-			current_player = &(e_state->player_1);
+			play_turn(e_state, &(e_state->player_1), &(e_state->player_2));
 		}
 		else
 		{	
-			current_player = &(e_state->player_2);
+			play_turn(e_state, &(e_state->player_2), &(e_state->player_1));
 		}
 		
-		if( current_player->type == IA )
-		{
-			
-			SMove moves[4];
-			SGameState g_state_cpy;
-			if(e_state->current_player->type == EPlayer1)
-			{
-				//le joueur 1 étant celui quiva de la case 1 à 24 pour l'arbitre, il faut inverser les places car l'IA fait bouger les pions de 24 à 1
-				copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
-			}
-			else
-			{
-				copy_game_state(&g_state_cpy, &(e_state->g_state) );
-			}
-			
-			current_player->functions.make_decision(&g_state_cpy, moves, false);
-			
-			
-			while(!moves_valid(moves) && e_state->nb_error_IA < 3)
-			{
-				current_player->functions.make_decision(&g_state_cpy, moves, true);
-				e_state->nb_error_IA++;
-			}
-			
-			if(moves_valid(moves))
-			{
-				copy_moves(e_state->current_moves, moves);
-				
-				
-				/*temporaire, en attente de quentin*/
-				e_state->current_moves[0].src_point = 0;
-				e_state->current_moves[0].dest_point = 3;
-				
-				e_state->current_moves[1].src_point = 0;
-				e_state->current_moves[1].dest_point = 3;
-				/**************************************/
-				/**************************************/
-				/**************************************/
-				/**************************************/
-				
-				e_state->nb_current_moves = 2;
-				e_state->current_player = current_player;
-				
-				if(current_player->number == EPlayer1)
-				{
-					e_state->pending_player = &(e_state->player_2);
-				}
-				else
-				{
-					e_state->pending_player = &(e_state->player_1);
-				}
-				
-				sprintf(tmp, "%s\nva commencer\nà jouer", current_player->name);
-				add_message(e_state,tmp, 700, 455, 520, 300, make_moves);
-			}
-			else
-			{
-				sprintf(tmp, "%s\ns'est trompé\ntrois fois!", current_player->name);
-				add_message(e_state,tmp, 700, 455, 520, 300, give_up);
-			}
-		}else
-		{
-			e_state->current_move_number = 0;
-		}
 	}
 }
 
@@ -413,7 +401,11 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 	
 	if( active_player->type == IA )
 	{
-		throw_dice(e_state);
+		e_state->is_human_playing = false;
+		if(!e_state->is_first_turn)
+		{
+			throw_dice(e_state);
+		}
 		
 		SGameState g_state_cpy;
 		if(active_player->type == EPlayer1)
@@ -425,37 +417,39 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			copy_game_state(&g_state_cpy, &(e_state->g_state) );
 		}
 		
-		
-		//débat sur le doublement de la mise
-		if( active_player->number == e_state->stake_owner)
+		if(!e_state->is_first_turn)
 		{
-			if( active_player->functions.double_stack(&g_state_cpy) )
+			//débat sur le doublement de la mise
+			if( active_player->number == e_state->stake_owner)
 			{
-				if( opponent->type == IA )
+				if( active_player->functions.double_stack(&g_state_cpy) )
 				{
-					if(active_player->type == EPlayer1)
+					if( opponent->type == IA )
 					{
-						copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
+						if(active_player->type == EPlayer1)
+						{
+							copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
+						}
+						else
+						{
+							copy_game_state(&g_state_cpy, &(e_state->g_state) );
+						}
+						if( opponent->functions.take_double(&g_state_cpy) )
+						{
+							double_stack(e_state);
+						}else
+						{
+							
+							give_up(e_state);
+						}
 					}
 					else
 					{
-						copy_game_state(&g_state_cpy, &(e_state->g_state) );
+						sprintf(tmp, "%s\npropose de doubler la mise,\nacceptez vous?", active_player->name);
+						add_message(e_state,tmp, 700, 255, 520, 300, NULL);
+						add_message(e_state,"OUI", 700, 255, 520, 140, double_stack);
+						add_message(e_state,"NON", 850, 255, 520, 140, give_up);
 					}
-					if( opponent->functions.take_double(&g_state_cpy) )
-					{
-						double_stack(e_state);
-					}else
-					{
-						
-						give_up(e_state);
-					}
-				}
-				else
-				{
-					sprintf(tmp, "%s\npropose de doubler la mise,\nacceptez vous?", active_player->name);
-					add_message(e_state,tmp, 700, 255, 520, 300, NULL);
-					add_message(e_state,"OUI", 700, 255, 520, 140, double_stack);
-					add_message(e_state,"NON", 850, 255, 520, 140, give_up);
 				}
 			}
 		}
@@ -494,20 +488,40 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			/**************************************/
 			/**************************************/
 			/**************************************/
-			
-			sprintf(tmp, "%s\nva jouer", active_player->name);
-			add_message(e_state,tmp, 700, 455, 520, 300, make_moves);
+			if(e_state->is_first_turn)
+			{
+				sprintf(tmp, "%s\nva jouer", active_player->name);
+				add_message(e_state,tmp, 700, 455, 520, 300, make_moves);
+				e_state->is_first_turn = false;
+			}else
+			{
+				sprintf(tmp, "%s\nva commencer\nà jouer", active_player->name);
+				add_message(e_state,tmp, 700, 455, 520, 300, make_moves);
+			}
 		}
 		else
 		{
 			sprintf(tmp, "%s\ns'est trompé\ntrois fois!", active_player->name);
-			e_state->current_player = opponent;
-			add_message(e_state,tmp, 700, 455, 520, 300, current_player_win_game);
+			add_message(e_state,tmp, 700, 455, 520, 300, give_up);
 		}
 	}
 	else
 	{
-		e_state->current_move_number = 0;
+		if(!e_state->is_first_turn)
+		{
+			erase_messages(e_state);
+			add_message(e_state,"lancer les\ndés", 700, 455, 520, 300, throw_dice_HUMAN);
+			e_state->is_first_turn = false;			
+		}else
+		{
+			printf("FF\n");
+			e_state->is_human_playing = true;
+			calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+	
+			erase_messages(e_state);
+			sprintf(tmp, "%s\njoue en premier", active_player->name);
+			add_message(e_state,tmp, 700, 455, 520, 300, erase_messages);
+		}
 	}
 }
 
@@ -587,12 +601,14 @@ void copy_moves(SMove cpy[4], SMove original[4])
 
 void make_moves(engine_state* e_state)
 {
+	/*
 	for(int i = 0; i < e_state->nb_current_moves; i++)
 	{
 		e_state->g_state.zones[e_state->current_moves[i].src_point].nb_checkers --;
 		e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers ++;
 		e_state->g_state.zones[e_state->current_moves[i].dest_point].player = e_state->current_player->number;
-	}
+	}*/
+	printf("%s a joué\n", e_state->current_player->name);
 	erase_messages(e_state);
 	if(e_state->g_state.zones[EPos_OutP1].nb_checkers >= 15)
 	{
@@ -652,8 +668,19 @@ void current_player_win_game(engine_state* e_state)
 	add_message(e_state,tmp, 700, 255, 520, 300, start_game);
 }
 
-int get_selected_checker(SGameState* g_state){};
+int get_selected_checker(SGameState* g_state)
+{
+	return 0;
+};
 
+void throw_dice_HUMAN(engine_state* e_state)
+{
+	
+	throw_dice(e_state);
+	e_state->is_human_playing = true;
+	calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+	print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,2);
+}
 
 
 

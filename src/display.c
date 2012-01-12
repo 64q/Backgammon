@@ -11,7 +11,7 @@
 #include "../include/engine.h"
 #include "../include/display.h"
 
-void init_display(display_manager* d_manager ,char* path_img)
+void init_display(display_manager* d_manager ,char* name_style)
 {
 	//position du fond
 	d_manager->background_position.x = 0;
@@ -33,24 +33,44 @@ void init_display(display_manager* d_manager ,char* path_img)
 	d_manager->window_mode_width = 800;
 
 	//on enregistre le chemin des images pour plus tard
-	d_manager->path_img = (char*)malloc((strlen(path_img) + 1) * sizeof(char));
+	char tmp[100];
+	sprintf(tmp, "./styles/%s/", name_style);
+	
+	
+	d_manager->path_img = (char*)malloc((strlen(tmp) + 1) * sizeof(char));
 
 	//contiendra la chaîne concaténée
-	strcpy(d_manager->path_img, path_img);
+	strcpy(d_manager->path_img, tmp);
 	char path_img_cp[100];
 
 	//on charge chaque image du dossier passé en paramètre
+	
+	
+	/* Chargement de la police */
+	strcpy(path_img_cp, tmp);
+	strcat(path_img_cp, "font.ttf");
+	d_manager->font = TTF_OpenFont(path_img_cp, 70);
+	if( d_manager->font == NULL)
+	{
+		printf("Le style n'a pas été défini ou n'existe pas, style par défaut chargé\n");
+		d_manager->path_img = "./styles/default/";
+		strcpy(tmp,"./styles/default/");
+		strcpy(path_img_cp, tmp);
+		strcat(path_img_cp, "font.ttf");
+		d_manager->font = TTF_OpenFont(path_img_cp, 70);
+		
+	}
+	
 
 	//icone
-	strcpy(path_img_cp, path_img);
+	strcpy(path_img_cp, tmp);
 	strcat(path_img_cp, "icone.png");
+	
+	
 	SDL_WM_SetIcon(IMG_Load(path_img_cp), NULL);
 
 	
-	/* Chargement de la police */
-	strcpy(path_img_cp, path_img);
-	strcat(path_img_cp, "font.ttf");
-	d_manager->font = TTF_OpenFont(path_img_cp, 70);
+	
     
 	
 	//chargement des images
@@ -79,7 +99,7 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	pos.y = 0;
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(pos));
 	
-	if(e_state->current_player->type == HUMAN)
+	if(e_state->is_human_playing)
 	{
 		highlight_possible_moves(d_manager, e_state);
 	}
@@ -586,15 +606,44 @@ void stake_display(display_manager *d_manager, engine_state* e_state)
 
 void highlight_possible_moves(display_manager *d_manager, engine_state* e_state)
 {
-// 	int i = 0;
-// 	while( e_state->current_possible_moves[i] != NULL)
-// 	{
-// 		if(moving_checker_pos.x == -1)
-// 		{
-// 			
-// 		}
-// 		i++;
-// 	}
+	SDL_Rect pos;
+	int nb_pos;
+	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	{
+		nb_pos = e_state->current_possible_moves[i].head.src_point;
+		if(nb_pos <= EPos_24)
+		{
+			if(nb_pos <= EPos_6)
+			{
+				pos.x = 1180 - nb_pos * 100;
+			}
+			else if(nb_pos <= EPos_12)
+			{ 
+				pos.x = 510 - (nb_pos - 6) * 100;
+			}
+			else if( nb_pos <= EPos_18 )
+			{
+				pos.x = 510 - (EPos_18 - nb_pos) * 100;
+			}
+			else
+			{
+				pos.x = 1180 - (EPos_24 - nb_pos) * 100;
+			}
+			
+			if(nb_pos <= EPos_12)
+			{
+				pos.y = 570;
+				SDL_BlitSurface(d_manager->highlight_down, NULL, d_manager->backBuffer, &(pos));
+			}
+			else
+			{
+				pos.y = 10;
+				SDL_BlitSurface(d_manager->highlight_up, NULL, d_manager->backBuffer, &(pos));
+								
+			}
+		}	
+		
+	}
 }
 void free_surface(display_manager* d_manager)
 {
@@ -610,8 +659,6 @@ void free_surface(display_manager* d_manager)
     SDL_FreeSurface(d_manager->dice);
 	SDL_FreeSurface(d_manager->message_border);
 	SDL_FreeSurface(d_manager->message_border_clicked);
-	free(d_manager->path_img);
-	
 }
 
 void switch_to_full_screen(display_manager* d_manager)
@@ -697,7 +744,8 @@ void load_images(display_manager* d_manager)
 	//sprite des dés
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "highlight.png");
-	d_manager->highlight = IMG_Load(path_img_cp);
+	d_manager->highlight_down = IMG_Load(path_img_cp);
+	d_manager->highlight_up = rotozoomSurface (d_manager->highlight_down, 180.0, 1.0, 1.0);
 	
 	//sprite des dés
 	strcpy(path_img_cp, d_manager->path_img);
