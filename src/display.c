@@ -123,6 +123,11 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	//mise
 	stake_display(d_manager, e_state);
 	
+	if(e_state->is_human_playing && e_state->src_selected_checker != -1)
+	{
+		moving_checker_display(d_manager, e_state);
+	}
+	
 	//messages
 	messages_display(d_manager, e_state);
 	
@@ -608,42 +613,64 @@ void highlight_possible_moves(display_manager *d_manager, engine_state* e_state)
 {
 	SDL_Rect pos;
 	int nb_pos;
-	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	
+	
+	if(e_state->src_selected_checker == -1)
 	{
-		nb_pos = e_state->current_possible_moves[i].head.src_point;
-		if(nb_pos <= EPos_24)
-		{
-			if(nb_pos <= EPos_6)
-			{
-				pos.x = 1180 - nb_pos * 100;
-			}
-			else if(nb_pos <= EPos_12)
-			{ 
-				pos.x = 510 - (nb_pos - 6) * 100;
-			}
-			else if( nb_pos <= EPos_18 )
-			{
-				pos.x = 510 - (EPos_18 - nb_pos) * 100;
-			}
-			else
-			{
-				pos.x = 1180 - (EPos_24 - nb_pos) * 100;
-			}
-			
-			if(nb_pos <= EPos_12)
-			{
-				pos.y = 570;
-				SDL_BlitSurface(d_manager->highlight_down, NULL, d_manager->backBuffer, &(pos));
-			}
-			else
-			{
-				pos.y = 10;
-				SDL_BlitSurface(d_manager->highlight_up, NULL, d_manager->backBuffer, &(pos));
-								
-			}
-		}	
 		
+		for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+		{
+			nb_pos = e_state->current_possible_moves[i].head.src_point;
+			if(nb_pos <= EPos_24)
+			{
+				if(nb_pos <= EPos_6)
+				{
+					pos.x = 1180 - nb_pos * 100;
+				}
+				else if(nb_pos <= EPos_12)
+				{ 
+					pos.x = 510 - (nb_pos - 6) * 100;
+				}
+				else if( nb_pos <= EPos_18 )
+				{
+					pos.x = 510 - (EPos_18 - nb_pos) * 100;
+				}
+				else
+				{
+					pos.x = 1180 - (EPos_24 - nb_pos) * 100;
+				}
+				
+				if(nb_pos <= EPos_12)
+				{
+					pos.y = 570;
+					SDL_BlitSurface(d_manager->highlight_down, NULL, d_manager->backBuffer, &(pos));
+				}
+				else
+				{
+					pos.y = 10;
+					SDL_BlitSurface(d_manager->highlight_up, NULL, d_manager->backBuffer, &(pos));
+									
+				}
+			}	
+			
+		}
 	}
+}
+
+void moving_checker_display(display_manager* d_manager, engine_state* e_state)
+{
+	SDL_Rect pos;
+	int x, y;
+	SDL_GetMouseState(&(x), &(y)); 
+	pos.x = (x - 25)/d_manager->ratio;
+	pos.y = (y - 25)/d_manager->ratio;
+	
+	
+	if(e_state->g_state.zones[e_state->src_selected_checker].player == EPlayer1)
+		SDL_BlitSurface(d_manager->white, NULL, d_manager->backBuffer, &(pos));
+		
+	if(e_state->g_state.zones[e_state->src_selected_checker].player == EPlayer2)
+		SDL_BlitSurface(d_manager->black, NULL, d_manager->backBuffer, &(pos));
 }
 void free_surface(display_manager* d_manager)
 {

@@ -107,7 +107,7 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, 
 	e_state->run = true;
 	e_state->score_to_reach = 3;
 	e_state->stake_owner = EPlayer1 + EPlayer2; //2 ne correspond ni a EPlayer1 ni EPlayer2
-	
+	e_state->src_selected_checker = -1;
 	e_state->nb_error_IA = 0;
 	
 	init_game( &(e_state->g_state) );
@@ -248,12 +248,18 @@ void on_click_listener(engine_state* e_state, double ratio)
 	
 	//rajouter la partie :
 	//si le joueur courant est humain, si il clic sur un pion autorisé, on enregistre le pion en cours de transport ainsi que d'où il vient
-	if( e_state->current_player->type == HUMAN &&  e_state->src_selected_checker == -1)
+	if(e_state->nb_messages == 0)
 	{
-		int res = get_selected_checker(&(e_state->g_state));
-		if(res != -1 )
+		if( e_state->is_human_playing &&  e_state->src_selected_checker == -1)
 		{
-			e_state->src_selected_checker = res;
+			
+			int res = get_selected_checker(e_state, x, y);
+			if(res != -1 )
+			{
+				e_state->src_selected_checker = res;
+				e_state->g_state.zones[e_state->src_selected_checker].nb_checkers--;
+				set_next_possible_moves(e_state, res);
+			}
 		}
 	}
 }
@@ -281,6 +287,22 @@ void on_unclick_listener(engine_state* e_state, double ratio)
 	//si il le relache on regarde si il tombe dans un endroit autorisé
 	//si oui on ajoute met à jour le plateau
 	//si tous les dés on été utilisé, on appel la fonction play_turn
+	
+	if(e_state->nb_messages == 0)
+	{
+		if( e_state->is_human_playing &&  e_state->src_selected_checker != -1)
+		{
+			
+			int res = get_selected_checker(e_state, x, y);
+			if(res != -1 )
+			{
+				e_state->src_selected_checker = -1;
+				e_state->g_state.zones[res].nb_checkers++;
+				e_state->g_state.zones[res].player = e_state->current_player->number;
+				
+			}
+		}
+	}
 	
 }
 
@@ -514,7 +536,6 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			e_state->is_first_turn = false;			
 		}else
 		{
-			printf("FF\n");
 			e_state->is_human_playing = true;
 			calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
 	
@@ -668,18 +689,141 @@ void current_player_win_game(engine_state* e_state)
 	add_message(e_state,tmp, 700, 255, 520, 300, start_game);
 }
 
-int get_selected_checker(SGameState* g_state)
+int get_selected_checker(engine_state* e_state, int x, int y)
 {
-	return 0;
-};
+	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	{
+		
+		switch(e_state->current_possible_moves[i].head.src_point)
+		{
+			case EPos_1:
+				if(x <= 1280 && x > 1180 && y >=570 && y < 1070)
+					return EPos_1;
+				break;
+			case EPos_2:
+				if(x <= 1180 && x > 1080 && y >=570 && y < 1070)
+					return EPos_2;
+				break;
+			case EPos_3:
+				if(x <= 1080 && x > 980 && y >=570 && y < 1070)
+					return EPos_3;
+				break;
+			case EPos_4:
+				if(x <= 980 && x > 880 && y >=570 && y < 1070)
+					return EPos_4;
+				break;
+			case EPos_5:
+				if(x <= 880 && x > 780 && y >=570 && y < 1070)
+					return EPos_5;
+				break;
+			case EPos_6:
+				if(x <= 780 && x > 680 && y >=570 && y < 1070)
+					return EPos_6;
+				break;
+			case EPos_7:
+				if(x <= 610 && x > 510 && y >=570 && y < 1070)
+					return EPos_7;
+				break;
+			case EPos_8:
+				if(x <= 510 && x > 410 && y >=570 && y < 1070)
+					return EPos_8;
+				break;
+			case EPos_9:
+				if(x <= 410 && x > 310 && y >=570 && y < 1070)
+					return EPos_9;
+				break;
+			case EPos_10:
+				if(x <= 310 && x > 210 && y >=570 && y < 1070)
+					return EPos_10;
+				break;
+			case EPos_11:
+				if(x <= 210 && x > 110 && y >=570 && y < 1070)
+					return EPos_11;
+				break;
+			case EPos_12:
+				if(x <= 110 && x > 10 && y >=570 && y < 1070)
+					return EPos_12;
+				break;
+			case EPos_24:
+				if(x <= 1280 && x > 1180 && y >=10 && y < 510)
+					return EPos_24;
+				break;
+			case EPos_23:
+				if(x <= 1180 && x > 1080 && y >=10 && y < 510)
+					return EPos_23;
+				break;
+			case EPos_22:
+				if(x <= 1080 && x > 980 && y >=10 && y < 510)
+					return EPos_22;
+				break;
+			case EPos_21:
+				if(x <= 980 && x > 880 && y >=10 && y < 510)
+					return EPos_21;
+				break;
+			case EPos_20:
+				if(x <= 880 && x > 780 && y >=10 && y < 510)
+					return EPos_20;
+				break;
+			case EPos_19:
+				if(x <= 780 && x > 680 && y >=10 && y < 510)
+					return EPos_19;
+				break;
+			case EPos_18:
+				if(x <= 610 && x > 510 && y >=10 && y < 510)
+					return EPos_18;
+				break;
+			case EPos_17:
+				if(x <= 510 && x > 410 && y >=10 && y < 510)
+					return EPos_17;
+				break;
+			case EPos_16:
+				if(x <= 410 && x > 310 && y >=10 && y < 510)
+					return EPos_16;
+				break;
+			case EPos_15:
+				if(x <= 310 && x > 210 && y >=10 && y < 510)
+					return EPos_15;
+				break;
+			case EPos_14:
+				if(x <= 210 && x > 110 && y >=10 && y < 510)
+					return EPos_14;
+				break;
+			case EPos_13:
+				if(x <= 110 && x > 10 && y >=10 && y < 510)
+					return EPos_13;
+				break;
+			default:
+				return -1;
+		}
+		
+	}
+	return -1;
+}
+
+void set_next_possible_moves(engine_state* e_state, int checker)
+{
+	
+	int i = 0;
+	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.dest_point != checker)
+	{
+		i++;
+		printf("salzqazd \n");
+	}
+	if(i < e_state->nb_current_possible_moves)
+	{
+		printf("salut \n");
+		e_state->current_possible_moves = e_state->current_possible_moves[i].nexts;
+		e_state->nb_current_possible_moves = e_state->current_possible_moves[i].l_nexts;
+	}
+}
 
 void throw_dice_HUMAN(engine_state* e_state)
 {
-	
+	erase_messages(e_state);
 	throw_dice(e_state);
 	e_state->is_human_playing = true;
 	calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
-	print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,2);
+	//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,2);
 }
 
 

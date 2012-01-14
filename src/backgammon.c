@@ -15,13 +15,13 @@
 int main(int argc, char *argv[])
 {
 	
-	int fps = 60;
+	int fps = 100;
 	int delay = 1000/fps;
 	
 	parametre param;
 	set_parametre( argc, argv, &param);
 
-	printf("%s\n", param.style);
+	
 	
 	display_manager d_manager;
 	init_display(&d_manager, param.style);

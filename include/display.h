@@ -81,6 +81,7 @@ void checker_display(display_manager*, SGameState*  );
 //affiche les pions
 void checker_display(display_manager*, SGameState*);
 
+void moving_checker_display(display_manager* d_manager, engine_state* e_state);
 
 //affiche les scores et autres informations (private)
 void infos_display(display_manager*, engine_state*);

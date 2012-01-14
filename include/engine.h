@@ -74,7 +74,7 @@ typedef struct engine_state
 	player* current_player;
 	player* pending_player;
 	
-	SList_moves *current_possible_moves;
+	void current_possible_moves;
 	int nb_current_possible_moves;
 	int is_human_playing;
 	
@@ -129,7 +129,8 @@ void copy_moves(SMove cpy[4], SMove original[4]);
 void make_moves(engine_state* e_state);
 void give_up(engine_state* e_state);
 void current_player_win_game(engine_state* e_state);
-int get_selected_checker(SGameState* g_state);
+int get_selected_checker(engine_state* e_state, int x, int y);
+SList_moves* set_next_possible_moves(engine_state* e_state, int checker);
 void throw_dice_HUMAN(engine_state* e_state);
 #endif
 
