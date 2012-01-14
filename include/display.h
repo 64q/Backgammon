@@ -40,6 +40,7 @@ typedef struct display_manager
 	
 	SDL_Surface* highlight_up;
 	SDL_Surface* highlight_down;
+	SDL_Surface* highlight_out;
 	
 	//font
 	TTF_Font *font;

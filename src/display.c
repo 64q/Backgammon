@@ -613,47 +613,77 @@ void highlight_possible_moves(display_manager *d_manager, engine_state* e_state)
 {
 	SDL_Rect pos;
 	int nb_pos;
+	int size_tab;
 	
 	
 	if(e_state->src_selected_checker == -1)
 	{
+		size_tab = e_state->nb_current_possible_moves;
 		
-		for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	}
+	else
+	{
+		size_tab = e_state->nb_possible_destinations;
+	}
+	for(int i = 0; i < size_tab; i++)
+	{
+		if(e_state->src_selected_checker == -1)
 		{
 			nb_pos = e_state->current_possible_moves[i].head.src_point;
-			if(nb_pos <= EPos_24)
-			{
-				if(nb_pos <= EPos_6)
-				{
-					pos.x = 1180 - nb_pos * 100;
-				}
-				else if(nb_pos <= EPos_12)
-				{ 
-					pos.x = 510 - (nb_pos - 6) * 100;
-				}
-				else if( nb_pos <= EPos_18 )
-				{
-					pos.x = 510 - (EPos_18 - nb_pos) * 100;
-				}
-				else
-				{
-					pos.x = 1180 - (EPos_24 - nb_pos) * 100;
-				}
-				
-				if(nb_pos <= EPos_12)
-				{
-					pos.y = 570;
-					SDL_BlitSurface(d_manager->highlight_down, NULL, d_manager->backBuffer, &(pos));
-				}
-				else
-				{
-					pos.y = 10;
-					SDL_BlitSurface(d_manager->highlight_up, NULL, d_manager->backBuffer, &(pos));
-									
-				}
-			}	
-			
 		}
+		else
+		{
+			nb_pos = e_state->possible_destination[i];
+		}
+		
+		if(nb_pos <= EPos_24)
+		{
+			if(nb_pos <= EPos_6)
+			{
+				pos.x = 1180 - nb_pos * 100;
+			}
+			else if(nb_pos <= EPos_12)
+			{ 
+				pos.x = 510 - (nb_pos - 6) * 100;
+			}
+			else if( nb_pos <= EPos_18 )
+			{
+				pos.x = 510 - (EPos_18 - nb_pos) * 100;
+			}
+			else
+			{
+				pos.x = 1180 - (EPos_24 - nb_pos) * 100;
+			}
+			
+			if(nb_pos <= EPos_12)
+			{
+				pos.y = 570;
+				SDL_BlitSurface(d_manager->highlight_down, NULL, d_manager->backBuffer, &(pos));
+			}
+			else
+			{
+				pos.y = 10;
+				SDL_BlitSurface(d_manager->highlight_up, NULL, d_manager->backBuffer, &(pos));
+								
+			}
+		}
+		else
+		{
+			if(nb_pos == EPos_OutP1)
+			{
+				pos.x = 1290;
+				pos.y = 35;
+				SDL_BlitSurface(d_manager->highlight_out, NULL, d_manager->backBuffer, &(pos));
+			}
+			
+			if(nb_pos == EPos_OutP2)
+			{
+				pos.x = 1290;
+				pos.y = 595;
+				SDL_BlitSurface(d_manager->highlight_out, NULL, d_manager->backBuffer, &(pos));
+			}
+		}
+		
 	}
 }
 
@@ -758,26 +788,31 @@ void load_images(display_manager* d_manager)
 	strcat(path_img_cp, "dice.png");
 	d_manager->dice = IMG_Load(path_img_cp);
 	
-	//sprite des dés
+	//sprite des de la mise
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "stake.png");
 	d_manager->stake = IMG_Load(path_img_cp);
 	
-	//sprite des dés
+	//sprite de la bordure des messsages
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "message_border.png");
 	d_manager->message_border = IMG_Load(path_img_cp);
 	
-	//sprite des dés
+	
+	//sprite des messages cliqués
+	strcpy(path_img_cp, d_manager->path_img);
+	strcat(path_img_cp, "message_border_clicked.png");
+	d_manager->message_border_clicked = IMG_Load(path_img_cp);
+	
+	//sprite de la mise en valeur des zones d'atterissage possible des pions
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "highlight.png");
 	d_manager->highlight_down = IMG_Load(path_img_cp);
 	d_manager->highlight_up = rotozoomSurface (d_manager->highlight_down, 180.0, 1.0, 1.0);
 	
-	//sprite des dés
 	strcpy(path_img_cp, d_manager->path_img);
-	strcat(path_img_cp, "message_border_clicked.png");
-	d_manager->message_border_clicked = IMG_Load(path_img_cp);
+	strcat(path_img_cp, "highlight_out.png");
+	d_manager->highlight_out = IMG_Load(path_img_cp);
 }
 
 //ajouter une fonction qui affiche les pions qui peuvent bouger

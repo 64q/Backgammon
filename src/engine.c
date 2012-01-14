@@ -133,7 +133,7 @@ void init_game(SGameState * game_state)
 	game_state->stake = 1;
 	game_state->die1 = 0;
 	game_state->die2 = 0;
-	 
+	 /*
 	//on considère que le joueur 1 est le joueur qui joue dans le sens des aiguilles d'une montre (pour l'affichage)
 	game_state->zones[EPos_1].player = EPlayer1;
 	game_state->zones[EPos_1].nb_checkers = 2;
@@ -174,6 +174,61 @@ void init_game(SGameState * game_state)
 	game_state->zones[EPos_19].nb_checkers = 5;
 	
 	game_state->zones[EPos_20].nb_checkers = 0;
+	game_state->zones[EPos_21].nb_checkers = 0;
+	game_state->zones[EPos_22].nb_checkers = 0;
+	game_state->zones[EPos_23].nb_checkers = 0;
+	
+	game_state->zones[EPos_24].player = EPlayer2;
+	game_state->zones[EPos_24].nb_checkers = 2;
+	
+	game_state->zones[EPos_OutP1].nb_checkers=0;
+	game_state->zones[EPos_BarP1].nb_checkers=0;
+	
+	game_state->zones[EPos_OutP2].nb_checkers=0;
+	game_state->zones[EPos_BarP2].nb_checkers=0;
+	*/
+	 
+	 game_state->zones[EPos_1].player = EPlayer1;
+	game_state->zones[EPos_1].nb_checkers = 0;
+	
+	game_state->zones[EPos_2].nb_checkers = 0;
+	game_state->zones[EPos_3].nb_checkers = 0;
+	game_state->zones[EPos_4].nb_checkers = 0;
+	game_state->zones[EPos_5].nb_checkers = 0;
+	
+	game_state->zones[EPos_6].player = EPlayer2;
+	game_state->zones[EPos_6].nb_checkers = 5;
+	
+	game_state->zones[EPos_7].nb_checkers = 0;
+	
+	game_state->zones[EPos_8].player = EPlayer2;
+	game_state->zones[EPos_8].nb_checkers = 3;
+	
+	game_state->zones[EPos_9].nb_checkers = 0;
+	game_state->zones[EPos_10].nb_checkers = 0;
+	game_state->zones[EPos_11].nb_checkers = 0;
+	
+	game_state->zones[EPos_12].player = EPlayer1;
+	game_state->zones[EPos_12].nb_checkers = 0;
+	
+	game_state->zones[EPos_13].player = EPlayer2;
+	game_state->zones[EPos_13].nb_checkers = 5;
+	
+	game_state->zones[EPos_14].nb_checkers = 0;
+	game_state->zones[EPos_15].nb_checkers = 0;
+	game_state->zones[EPos_16].nb_checkers = 0;
+	
+	game_state->zones[EPos_17].player = EPlayer1;
+	game_state->zones[EPos_17].nb_checkers = 0;
+	
+	game_state->zones[EPos_18].nb_checkers = 0;
+	
+	game_state->zones[EPos_19].player = EPlayer1;
+	game_state->zones[EPos_19].nb_checkers = 5;
+	
+	game_state->zones[EPos_20].player = EPlayer1;
+	game_state->zones[EPos_20].nb_checkers = 4;
+	
 	game_state->zones[EPos_21].nb_checkers = 0;
 	game_state->zones[EPos_22].nb_checkers = 0;
 	game_state->zones[EPos_23].nb_checkers = 0;
@@ -250,18 +305,80 @@ void on_click_listener(engine_state* e_state, double ratio)
 	//si le joueur courant est humain, si il clic sur un pion autorisé, on enregistre le pion en cours de transport ainsi que d'où il vient
 	if(e_state->nb_messages == 0)
 	{
-		if( e_state->is_human_playing &&  e_state->src_selected_checker == -1)
+		if( e_state->is_human_playing)
 		{
-			
-			int res = get_selected_checker(e_state, x, y);
-			if(res != -1 )
+			//si aucun pion n'est selectionné on cherche un pion à bouger
+			if(e_state->src_selected_checker == -1)
 			{
-				e_state->src_selected_checker = res;
-				e_state->g_state.zones[e_state->src_selected_checker].nb_checkers--;
-				set_next_possible_moves(e_state, res);
+				int res = get_selected_checker(e_state, x, y);
+				//si on a cliqué sur une zone de laquelle on peut prendre un pion
+				if(res != -1 )
+				{
+					e_state->src_selected_checker = res;
+					e_state->g_state.zones[e_state->src_selected_checker].nb_checkers--;
+					//on enregistre les positions qui peuvent recevoir ce pion
+					set_possible_destination(e_state, res);
+				}
 			}
+			else
+			{
+				//si un pion a déjà été selectionné, on cherche un endroit où le poser
+				int res = get_selected_checker(e_state, x, y);
+				
+				//si la zone peut recevoir le pion
+				if(res != -1 )
+				{
+					
+					e_state->g_state.zones[res].nb_checkers++;
+					e_state->g_state.zones[res].player = e_state->current_player->number;
+					e_state->src_selected_checker = -1;
+					set_next_possible_moves(e_state, res);
+					e_state->nb_moves++;
+					
+					
+					if(e_state->g_state.die1 == e_state->g_state.die2)
+					{
+						if(e_state->nb_moves == 4)
+						{
+							end_of_turn(e_state);
+						}
+						else
+						{
+							if(e_state->nb_current_possible_moves == 0)
+							{
+								add_message(e_state,"aucun mouvements\npossibles", 550, 455, 630, 220, end_of_turn);
+							}
+						}
+					}
+					else
+					{
+						if(e_state->nb_moves == 2)
+						{
+							end_of_turn(e_state);
+						}
+						else
+						{
+							if(e_state->nb_current_possible_moves == 0)
+							{
+								add_message(e_state,"aucun mouvements\npossibles", 700, 455, 330, 220, end_of_turn);
+							}
+						}
+					}
+					
+						
+				}
+				else
+				{
+					//sinon on remet le pion ou on l'a pris
+					e_state->g_state.zones[e_state->src_selected_checker].nb_checkers++;
+					e_state->src_selected_checker = -1;
+				}
+			}
+			
 		}
 	}
+	
+	
 }
 void on_unclick_listener(engine_state* e_state, double ratio)
 {
@@ -282,27 +399,9 @@ void on_unclick_listener(engine_state* e_state, double ratio)
 		}
 	}
 	
-	//si le joueur courant est humain
-	//on regarde si il était en train de transporter un pion 
-	//si il le relache on regarde si il tombe dans un endroit autorisé
-	//si oui on ajoute met à jour le plateau
-	//si tous les dés on été utilisé, on appel la fonction play_turn
 	
-	if(e_state->nb_messages == 0)
-	{
-		if( e_state->is_human_playing &&  e_state->src_selected_checker != -1)
-		{
-			
-			int res = get_selected_checker(e_state, x, y);
-			if(res != -1 )
-			{
-				e_state->src_selected_checker = -1;
-				e_state->g_state.zones[res].nb_checkers++;
-				e_state->g_state.zones[res].player = e_state->current_player->number;
-				
-			}
-		}
-	}
+	
+	
 	
 }
 
@@ -512,12 +611,12 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			/**************************************/
 			if(e_state->is_first_turn)
 			{
-				sprintf(tmp, "%s\nva jouer", active_player->name);
+				sprintf(tmp, "%s\nva commencer\nà jouer", active_player->name);
 				add_message(e_state,tmp, 700, 455, 520, 300, make_moves);
 				e_state->is_first_turn = false;
 			}else
 			{
-				sprintf(tmp, "%s\nva commencer\nà jouer", active_player->name);
+				sprintf(tmp, "%s\nva jouer", active_player->name);
 				add_message(e_state,tmp, 700, 455, 520, 300, make_moves);
 			}
 		}
@@ -529,11 +628,12 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 	}
 	else
 	{
+		e_state->nb_moves = 0;
 		if(!e_state->is_first_turn)
 		{
 			erase_messages(e_state);
 			add_message(e_state,"lancer les\ndés", 700, 455, 520, 300, throw_dice_HUMAN);
-			e_state->is_first_turn = false;			
+			
 		}else
 		{
 			e_state->is_human_playing = true;
@@ -542,6 +642,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			erase_messages(e_state);
 			sprintf(tmp, "%s\njoue en premier", active_player->name);
 			add_message(e_state,tmp, 700, 455, 520, 300, erase_messages);
+			e_state->is_first_turn = false;
 		}
 	}
 }
@@ -641,7 +742,7 @@ void make_moves(engine_state* e_state)
 	}
 	else
 	{
-		play_turn(e_state, e_state->pending_player, e_state->current_player);
+		end_of_turn(e_state);
 	}
 }
 
@@ -691,10 +792,28 @@ void current_player_win_game(engine_state* e_state)
 
 int get_selected_checker(engine_state* e_state, int x, int y)
 {
-	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	int checker;
+	int size_tab;
+	if(  e_state->src_selected_checker == -1)
 	{
-		
-		switch(e_state->current_possible_moves[i].head.src_point)
+		size_tab = e_state->nb_current_possible_moves;
+	}
+	else
+	{
+		size_tab = e_state->nb_possible_destinations;
+	}
+	
+	for(int i = 0; i < size_tab; i++)
+	{
+		if(  e_state->src_selected_checker == -1)
+		{
+			checker = e_state->current_possible_moves[i].head.src_point;
+		}
+		else
+		{
+			checker = e_state->possible_destination[i];
+		}
+		switch(checker)
 		{
 			case EPos_1:
 				if(x <= 1280 && x > 1180 && y >=570 && y < 1070)
@@ -792,6 +911,14 @@ int get_selected_checker(engine_state* e_state, int x, int y)
 				if(x <= 110 && x > 10 && y >=10 && y < 510)
 					return EPos_13;
 				break;
+			case EPos_OutP1:
+				if(x <= 1390 && x > 1290 && y >=35 && y < 485)
+					return EPos_OutP1;
+				break;
+			case EPos_OutP2:
+				if(x <= 110 && x > 10 && y >=595 && y < 1045)
+					return EPos_OutP2;
+				break;
 			default:
 				return -1;
 		}
@@ -804,18 +931,35 @@ void set_next_possible_moves(engine_state* e_state, int checker)
 {
 	
 	int i = 0;
-	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.dest_point != checker)
+	
+	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.src_point != e_state->src_selected_checker && e_state->current_possible_moves[i].head.dest_point != checker)
 	{
 		i++;
-		printf("salzqazd \n");
 	}
+			
 	if(i < e_state->nb_current_possible_moves)
-	{
-		printf("salut \n");
-		e_state->current_possible_moves = e_state->current_possible_moves[i].nexts;
+	{				
 		e_state->nb_current_possible_moves = e_state->current_possible_moves[i].l_nexts;
+		e_state->current_possible_moves = e_state->current_possible_moves[i].nexts;
+		
 	}
 }
+
+void set_possible_destination(engine_state* e_state, int checker_moving)
+{
+	e_state->nb_possible_destinations = 0;
+	e_state->possible_destination = (int*)malloc(e_state->nb_current_possible_moves * sizeof(int));
+	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	{
+		if(e_state->current_possible_moves[i].head.src_point == checker_moving )
+		{
+			e_state->nb_possible_destinations++;
+			e_state->possible_destination[e_state->nb_possible_destinations - 1] = e_state->current_possible_moves[i].head.dest_point;
+		}
+
+	}
+}
+
 
 void throw_dice_HUMAN(engine_state* e_state)
 {
@@ -823,7 +967,13 @@ void throw_dice_HUMAN(engine_state* e_state)
 	throw_dice(e_state);
 	e_state->is_human_playing = true;
 	calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+	e_state->first_possible_moves = e_state->current_possible_moves;
 	//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,2);
+}
+
+void end_of_turn(engine_state* e_state)
+{
+	play_turn(e_state, e_state->pending_player, e_state->current_player);
 }
 
 

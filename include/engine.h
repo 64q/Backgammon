@@ -74,9 +74,16 @@ typedef struct engine_state
 	player* current_player;
 	player* pending_player;
 	
-	void current_possible_moves;
+	SList_moves* first_possible_moves;
+	int nb_first_possible_moves;
+	SList_moves* current_possible_moves;
 	int nb_current_possible_moves;
+	
+	int *possible_destination;
+	int nb_possible_destinations;
+	
 	int is_human_playing;
+	int nb_moves;
 	
 	int src_selected_checker;
 	
@@ -130,7 +137,9 @@ void make_moves(engine_state* e_state);
 void give_up(engine_state* e_state);
 void current_player_win_game(engine_state* e_state);
 int get_selected_checker(engine_state* e_state, int x, int y);
-SList_moves* set_next_possible_moves(engine_state* e_state, int checker);
+void set_next_possible_moves(engine_state* e_state, int checker);
 void throw_dice_HUMAN(engine_state* e_state);
+void end_of_turn(engine_state* e_state);
+void set_possible_destination(engine_state* e_state, int checker_moving);
 #endif
 
