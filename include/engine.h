@@ -141,5 +141,11 @@ void set_next_possible_moves(engine_state* e_state, int checker);
 void throw_dice_HUMAN(engine_state* e_state);
 void end_of_turn(engine_state* e_state);
 void set_possible_destination(engine_state* e_state, int checker_moving);
+
+
+void reverse_moves(SList_moves** poss_moves, int ln_moves);
+void truc(engine_state* e_state);
+
+void reverse_moves2(SMove moves[]);
 #endif
 

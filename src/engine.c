@@ -133,10 +133,11 @@ void init_game(SGameState * game_state)
 	game_state->stake = 1;
 	game_state->die1 = 0;
 	game_state->die2 = 0;
-	 /*
+	 
 	//on considère que le joueur 1 est le joueur qui joue dans le sens des aiguilles d'une montre (pour l'affichage)
 	game_state->zones[EPos_1].player = EPlayer1;
 	game_state->zones[EPos_1].nb_checkers = 2;
+	
 	
 	game_state->zones[EPos_2].nb_checkers = 0;
 	game_state->zones[EPos_3].nb_checkers = 0;
@@ -165,7 +166,7 @@ void init_game(SGameState * game_state)
 	game_state->zones[EPos_15].nb_checkers = 0;
 	game_state->zones[EPos_16].nb_checkers = 0;
 	
-	game_state->zones[EPos_17].player = EPlayer1;
+	game_state->zones[EPos_17].player = EPlayer2;
 	game_state->zones[EPos_17].nb_checkers = 3;
 	
 	game_state->zones[EPos_18].nb_checkers = 0;
@@ -186,8 +187,8 @@ void init_game(SGameState * game_state)
 	
 	game_state->zones[EPos_OutP2].nb_checkers=0;
 	game_state->zones[EPos_BarP2].nb_checkers=0;
-	*/
-	 
+	
+	 /*
 	 game_state->zones[EPos_1].player = EPlayer1;
 	game_state->zones[EPos_1].nb_checkers = 0;
 	
@@ -241,6 +242,7 @@ void init_game(SGameState * game_state)
 	
 	game_state->zones[EPos_OutP2].nb_checkers=0;
 	game_state->zones[EPos_BarP2].nb_checkers=0;
+	*/
 }
 
 
@@ -364,8 +366,7 @@ void on_click_listener(engine_state* e_state, double ratio)
 							}
 						}
 					}
-					
-						
+
 				}
 				else
 				{
@@ -518,6 +519,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 {
 	e_state->current_player = active_player;
 	e_state->pending_player = opponent;
+	printf("%i:%s\n", e_state->current_player->number, e_state->current_player->name);
 	char tmp[100];
 	
 	if( active_player->type == IA )
@@ -529,7 +531,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 		}
 		
 		SGameState g_state_cpy;
-		if(active_player->type == EPlayer1)
+		if(active_player->type == EPlayer2)
 		{
 			copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
 		}
@@ -547,7 +549,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 				{
 					if( opponent->type == IA )
 					{
-						if(active_player->type == EPlayer1)
+						if(opponent->type == EPlayer2)
 						{
 							copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
 						}
@@ -577,7 +579,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 		
 		
 		SMove moves[4];
-		if(active_player->type == EPlayer1)
+		if(active_player->number == EPlayer2)
 		{
 			copy_reversed_game_state(&g_state_cpy, &(e_state->g_state) );
 		}
@@ -585,6 +587,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 		{
 			copy_game_state(&g_state_cpy, &(e_state->g_state) );
 		}
+		
 		active_player->functions.make_decision(&g_state_cpy, moves, false);
 		
 		
@@ -597,18 +600,15 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 		if(moves_valid(moves))
 		{
 			copy_moves(e_state->current_moves, moves);
+			if(active_player->number == EPlayer2)
+			{
+				reverse_moves2(e_state->current_moves);
+				printf("invers\n");
+			}
 			
-			/*temporaire, en attente de quentin*/
-			e_state->current_moves[0].src_point = 0;
-			e_state->current_moves[0].dest_point = 3;
 			
-			e_state->current_moves[1].src_point = 0;
-			e_state->current_moves[1].dest_point = 3;
-			/**************************************/
-			/**************************************/
-			/**************************************/
-			/**************************************/
-			/**************************************/
+			
+			erase_messages(e_state);
 			if(e_state->is_first_turn)
 			{
 				sprintf(tmp, "%s\nva commencer\nà jouer", active_player->name);
@@ -636,11 +636,11 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			
 		}else
 		{
-			e_state->is_human_playing = true;
-			calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+			truc(e_state);
 	
 			erase_messages(e_state);
 			sprintf(tmp, "%s\njoue en premier", active_player->name);
+			
 			add_message(e_state,tmp, 700, 455, 520, 300, erase_messages);
 			e_state->is_first_turn = false;
 		}
@@ -723,22 +723,40 @@ void copy_moves(SMove cpy[4], SMove original[4])
 
 void make_moves(engine_state* e_state)
 {
-	/*
-	for(int i = 0; i < e_state->nb_current_moves; i++)
+	int i = 0;
+	
+	while(e_state->current_moves[i].src_point != -1)
 	{
-		e_state->g_state.zones[e_state->current_moves[i].src_point].nb_checkers --;
-		e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers ++;
+		printf("%i:%i:i\n", e_state->current_moves[i].src_point, e_state->current_moves[i].dest_point, i);
+		e_state->g_state.zones[e_state->current_moves[i].src_point].nb_checkers--;
+		
+		if(e_state->g_state.zones[e_state->current_moves[i].dest_point].player != e_state->current_player->number 
+			&& e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers == 1)
+		{
+			if(e_state->current_player->number == EPlayer1)
+			{
+				e_state->g_state.zones[EPos_BarP2].player = EPlayer2;
+				e_state->g_state.zones[EPos_BarP2].nb_checkers ++;
+				e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers = 0;
+				
+			}else
+			{
+				e_state->g_state.zones[EPos_BarP1].player = EPlayer1;
+				e_state->g_state.zones[EPos_BarP1].nb_checkers ++;
+				e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers = 0;
+			}
+			
+		}
+		
 		e_state->g_state.zones[e_state->current_moves[i].dest_point].player = e_state->current_player->number;
-	}*/
+		e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers ++;
+		i++;
+	}
 	printf("%s a joué\n", e_state->current_player->name);
 	erase_messages(e_state);
-	if(e_state->g_state.zones[EPos_OutP1].nb_checkers >= 15)
+	if(e_state->g_state.zones[EPos_OutP1].nb_checkers >= 15 || e_state->g_state.zones[EPos_OutP2].nb_checkers >= 15)
 	{
-		
-	}
-	else if(e_state->g_state.zones[EPos_OutP2].nb_checkers >= 15)
-	{
-		
+		current_player_win_game(e_state);
 	}
 	else
 	{
@@ -963,12 +981,15 @@ void set_possible_destination(engine_state* e_state, int checker_moving)
 
 void throw_dice_HUMAN(engine_state* e_state)
 {
+	SGameState cpy_g_state;
 	erase_messages(e_state);
 	throw_dice(e_state);
 	e_state->is_human_playing = true;
-	calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+	
+	truc(e_state);
+	
 	e_state->first_possible_moves = e_state->current_possible_moves;
-	//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,2);
+	print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
 }
 
 void end_of_turn(engine_state* e_state)
@@ -976,8 +997,111 @@ void end_of_turn(engine_state* e_state)
 	play_turn(e_state, e_state->pending_player, e_state->current_player);
 }
 
+void reverse_moves(SList_moves** poss_moves, int ln_moves)
+{
+	int i;
+	
+	for (i = 0; i < ln_moves; i++)
+	{
+	
+		SList_moves* plist = ((*poss_moves)+i);
+		
+		switch(plist->head.src_point)
+		{
+			case EPos_BarP1:
+				plist->head.src_point = EPos_BarP2;
+				break;
+			case EPos_BarP2:
+				plist->head.src_point = EPos_BarP1;
+				break;
+			default:
+				plist->head.src_point = EPos_24 - plist->head.src_point;
+				break;
+		}
+		switch(plist->head.dest_point)
+		{
+			case EPos_BarP1:
+				plist->head.dest_point = EPos_BarP2;
+				break;
+			case EPos_BarP2:
+				plist->head.dest_point = EPos_BarP1;
+				break;
+			default:
+				plist->head.dest_point = EPos_24 - plist->head.dest_point;
+				break;
+		}
+		
+		if (plist->l_nexts != 0)
+		{
+			SList_moves** pm = (SList_moves**) malloc(sizeof(SList_moves*));
+			*pm = plist->nexts;
+	
+			reverse_moves(pm, plist->l_nexts);
+	
+			
+			free(pm);
+		}
+	}
+}
 
 
+void truc(engine_state* e_state)
+{
+	SGameState cpy_g_state;
+	e_state->is_human_playing = true;
+	if(e_state->current_player->number == EPlayer2)
+	{
+		copy_reversed_game_state(&cpy_g_state, &(e_state->g_state));
+		
+		calc_moves(&cpy_g_state, &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+		print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
+		reverse_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves);
+		//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
+		printf("22\n");
+	}
+	else
+	{
+		//copy_reversed_game_state(&cpy_g_state, &(e_state->g_state));
+		calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
+		//reverse_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves);
+		print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
+		printf("11\n");
+	}
+	
+	e_state->first_possible_moves = e_state->current_possible_moves;
+}
 
-
-
+void reverse_moves2(SMove moves[])
+{
+	int i = 0;
+	
+	while(moves[i].src_point != -1)
+	{
+		switch(moves[i].src_point)
+		{
+			case EPos_BarP1:
+				moves[i].src_point = EPos_BarP2;
+				break;
+			case EPos_BarP2:
+				moves[i].src_point = EPos_BarP1;
+				break;
+			default:
+				moves[i].src_point = EPos_24 - moves[i].src_point;
+				break;
+		}
+		switch(moves[i].dest_point)
+		{
+			case EPos_BarP1:
+				moves[i].dest_point = EPos_BarP2;
+				break;
+			case EPos_BarP2:
+				moves[i].dest_point = EPos_BarP1;
+				break;
+			default:
+				moves[i].dest_point = EPos_24 - moves[i].dest_point;
+				break;
+		}
+		
+		i++;
+	}
+}
