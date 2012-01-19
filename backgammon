@@ -1,1 +1,1 @@
-bin/backgammon -i IAYann -h Erwan -g quentin
+bin/backgammon -i libai.so -i libai.so -g quentin

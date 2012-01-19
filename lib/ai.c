@@ -62,7 +62,7 @@ int add_gm(SGameStateAndMoves** pgm, int l_pgm, SGameStateAndMoves gm);
 // Initialise la librairie
 void InitLibrary(char name[50])
 {
-	//strcpy(ai_name, name);
+	strcpy(name, "IA de Yann");
 	printf("Ghost Busters!\n");
 }
 

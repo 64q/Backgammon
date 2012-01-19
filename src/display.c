@@ -99,12 +99,13 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	pos.y = 0;
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(pos));
 	
-	if(e_state->is_human_playing)
+	if(e_state->is_human_playing == true)
 	{
 		highlight_possible_moves(d_manager, e_state);
 	}
 	
 	//pions
+	
 	checker_display(d_manager, &(e_state->g_state));
 	//nom + score
 	infos_display(d_manager, e_state);
