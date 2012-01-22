@@ -62,4 +62,3 @@ int TakeDouble(const SGameState * const gameState);
 void MakeDecision(const SGameState * const gameState, SMove moves[4], unsigned int lastTimeError);
 
 #endif
-

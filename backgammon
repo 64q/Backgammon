@@ -1,1 +1,1 @@
-bin/backgammon
+bin/backgammon -i libai.so -i libai.so -g quentin

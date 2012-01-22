@@ -38,7 +38,9 @@ typedef struct display_manager
 	SDL_Surface *message_border;
 	SDL_Surface *message_border_clicked;
 	
-	SDL_Surface* highlight;
+	SDL_Surface* highlight_up;
+	SDL_Surface* highlight_down;
+	SDL_Surface* highlight_out;
 	
 	//font
 	TTF_Font *font;
@@ -80,6 +82,7 @@ void checker_display(display_manager*, SGameState*  );
 //affiche les pions
 void checker_display(display_manager*, SGameState*);
 
+void moving_checker_display(display_manager* d_manager, engine_state* e_state);
 
 //affiche les scores et autres informations (private)
 void infos_display(display_manager*, engine_state*);

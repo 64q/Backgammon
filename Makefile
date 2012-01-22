@@ -19,7 +19,7 @@ LIB=lib/
 
 all: ${EXEC}
 
-${EXEC}: ${OBJ}backgammon.o ${OBJ}display.o ${OBJ}engine.o
+${EXEC}: ${OBJ}backgammon.o ${OBJ}display.o ${OBJ}engine.o ${OBJ}moves.o
 	${CC} -o ${BIN}$@ $^ ${LDFLAGS} -ldl -rdynamic
 
 # Règle pour compiler le programme
@@ -27,9 +27,11 @@ ${OBJ}backgammon.o: ${SRC}backgammon.c
 	${CC} -o $@ -c $^ ${CFLAGS}
 
 # Règle pour compiler le moteur de jeu
-${OBJ}engine.o: ${SRC}engine.c ${SRC}moves.c
+${OBJ}engine.o: ${SRC}engine.c
 	${CC} -o $@ -c $^ ${CFLAGS}
 
+${OBJ}moves.o: ${SRC}moves.c
+	${CC} -o $@ -c $^ ${CFLAGS}
 # Règle pour compiler l'UI
 ${OBJ}display.o: ${SRC}display.c
 	${CC} -o $@ -c $^ ${CFLAGS}

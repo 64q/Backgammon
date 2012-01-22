@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 #include "backgammon.h"
+#include "moves.h"
 
 
 #define IA 1
@@ -73,21 +74,40 @@ typedef struct engine_state
 	player* current_player;
 	player* pending_player;
 	
-	SMove *(current_possible_moves[4]);
-	int current_move_number;
+	SList_moves* first_possible_moves;
+	int nb_first_possible_moves;
+	SList_moves* current_possible_moves;
+	int nb_current_possible_moves;
+	
+	int *possible_destination;
+	int nb_possible_destinations;
+	
+	int is_human_playing;
+	int nb_moves;
+	
 	int src_selected_checker;
 	
 	int nb_error_IA;
+	int is_first_turn;
 
 }engine_state;
 
 typedef void (*ptr_fct_message)(engine_state*);
 
+typedef struct parametre
+{
+	char* name_player_1;
+	char*  name_player_2;
+	int type_player_1;
+	int type_player_2;
+	char *style;
 
+}parametre;
 
+void set_parametre( int argc, char *argv[], parametre* param);
 
 //initialise la structure engine_state avec le nom de chaque joueur et son type (IA ou HUMAN)
-void init_engine(engine_state* e_state, char *nameP1, int typeP1, char* path_lib_P1, char *nameP2, int typeP2, char* path_lib_P2);
+void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, int typeP2);
 
 //initialise l'état du jeu au départ (private)
 void init_game(SGameState*);
@@ -116,6 +136,16 @@ void copy_moves(SMove cpy[4], SMove original[4]);
 void make_moves(engine_state* e_state);
 void give_up(engine_state* e_state);
 void current_player_win_game(engine_state* e_state);
-int get_selected_checker(SGameState* g_state);
+int get_selected_checker(engine_state* e_state, int x, int y);
+void set_next_possible_moves(engine_state* e_state, int checker);
+void throw_dice_HUMAN(engine_state* e_state);
+void end_of_turn(engine_state* e_state);
+void set_possible_destination(engine_state* e_state, int checker_moving);
+
+
+void reverse_possible_moves(SList_moves** poss_moves, int ln_moves);
+void set_possible_moves(engine_state* e_state);
+
+void reverse_moves(SMove moves[]);
 #endif
 
