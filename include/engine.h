@@ -59,6 +59,7 @@ typedef struct engine_state
 	//contient la fonction qu iva être lancé quand on clic sur le message correspondant
 	void (*function[10])(struct engine_state*);
 	int nb_messages;
+	int message_load;
 	
 	SGameState g_state;
 	
@@ -146,6 +147,6 @@ void set_possible_destination(engine_state* e_state, int checker_moving);
 void reverse_possible_moves(SList_moves** poss_moves, int ln_moves);
 void set_possible_moves(engine_state* e_state);
 
-void reverse_moves(SMove moves[]);
+void reverse_moves(engine_state* e_state, SMove moves[]);
 #endif
 

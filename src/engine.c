@@ -64,8 +64,11 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, 
 	char tmp[100];
 	
 	
+	e_state->g_state.score = 0;
+	e_state->g_state.scoreP2 = 0;
+	init_game(&(e_state->g_state));
 	
-	
+	e_state->message_load = true;
 	
 	
 	e_state->player_1.type = typeP1;
@@ -124,7 +127,7 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, 
 	e_state->src_selected_checker = -1;
 	e_state->nb_error_IA = 0;
 	
-	init_game( &(e_state->g_state) );
+	
 	
 	srand(time(NULL));
 	if(load)
@@ -142,8 +145,7 @@ void init_engine(engine_state* e_state, char *nameP1, int typeP1, char *nameP2, 
 
 void init_game(SGameState * game_state)
 {
-	game_state->score = 0;
-	game_state->scoreP2 = 0;
+	
 	game_state->stake = 1;
 	game_state->die1 = 0;
 	game_state->die2 = 0;
@@ -215,59 +217,70 @@ void init_game(SGameState * game_state)
 	game_state->zones[EPos_BarP2].player = EPlayer2;
 	
 	 /*
-	 game_state->zones[EPos_1].player = EPlayer1;
+	game_state->zones[EPos_1].player = -1;
 	game_state->zones[EPos_1].nb_checkers = 0;
 	
-	game_state->zones[EPos_2].nb_checkers = 0;
-	game_state->zones[EPos_3].nb_checkers = 0;
-	game_state->zones[EPos_4].nb_checkers = 0;
-	game_state->zones[EPos_5].nb_checkers = 0;
+	int i;
+	for(i = EPos_2; i<=EPos_5; i++)
+	{
+		game_state->zones[i].nb_checkers = 0;
+		game_state->zones[i].player = -1;
+	}
 	
-	game_state->zones[EPos_6].player = EPlayer2;
-	game_state->zones[EPos_6].nb_checkers = 5;
+	game_state->zones[EPos_6].player = EPlayer1;
+	game_state->zones[EPos_6].nb_checkers = 15;
 	
 	game_state->zones[EPos_7].nb_checkers = 0;
+	game_state->zones[EPos_7].player = -1;
 	
-	game_state->zones[EPos_8].player = EPlayer2;
-	game_state->zones[EPos_8].nb_checkers = 3;
+	game_state->zones[EPos_8].player = -1;
+	game_state->zones[EPos_8].nb_checkers = 0;
 	
-	game_state->zones[EPos_9].nb_checkers = 0;
-	game_state->zones[EPos_10].nb_checkers = 0;
-	game_state->zones[EPos_11].nb_checkers = 0;
+	for(i = EPos_9; i<=EPos_11; i++)
+	{
+		game_state->zones[i].nb_checkers = 0;
+		game_state->zones[i].player = -1;
+	}
 	
-	game_state->zones[EPos_12].player = EPlayer1;
+	game_state->zones[EPos_12].player = -1;
 	game_state->zones[EPos_12].nb_checkers = 0;
 	
-	game_state->zones[EPos_13].player = EPlayer2;
-	game_state->zones[EPos_13].nb_checkers = 5;
+	game_state->zones[EPos_13].player = -1;
+	game_state->zones[EPos_13].nb_checkers = 0;
 	
-	game_state->zones[EPos_14].nb_checkers = 0;
-	game_state->zones[EPos_15].nb_checkers = 0;
-	game_state->zones[EPos_16].nb_checkers = 0;
+	for(i = EPos_14; i<=EPos_16; i++)
+	{
+		game_state->zones[i].nb_checkers = 0;
+		game_state->zones[i].player = -1;
+	}
 	
-	game_state->zones[EPos_17].player = EPlayer1;
+	game_state->zones[EPos_17].player = -1;
 	game_state->zones[EPos_17].nb_checkers = 0;
 	
+	game_state->zones[EPos_18].player = -1;
 	game_state->zones[EPos_18].nb_checkers = 0;
 	
-	game_state->zones[EPos_19].player = EPlayer1;
-	game_state->zones[EPos_19].nb_checkers = 5;
+	game_state->zones[EPos_19].player = EPlayer2;
+	game_state->zones[EPos_19].nb_checkers = 15;
 	
-	game_state->zones[EPos_20].player = EPlayer1;
-	game_state->zones[EPos_20].nb_checkers = 4;
+	for(i = EPos_20; i<=EPos_23; i++)
+	{
+		game_state->zones[i].nb_checkers = 0;
+		game_state->zones[i].player = -1;
+	}
 	
-	game_state->zones[EPos_21].nb_checkers = 0;
-	game_state->zones[EPos_22].nb_checkers = 0;
-	game_state->zones[EPos_23].nb_checkers = 0;
-	
-	game_state->zones[EPos_24].player = EPlayer2;
-	game_state->zones[EPos_24].nb_checkers = 2;
+	game_state->zones[EPos_24].player = -1;
+	game_state->zones[EPos_24].nb_checkers = 0;
 	
 	game_state->zones[EPos_OutP1].nb_checkers=0;
+	game_state->zones[EPos_OutP1].player = EPlayer1;
 	game_state->zones[EPos_BarP1].nb_checkers=0;
+	game_state->zones[EPos_BarP1].player = EPlayer1;
 	
 	game_state->zones[EPos_OutP2].nb_checkers=0;
+	game_state->zones[EPos_OutP2].player = EPlayer2;
 	game_state->zones[EPos_BarP2].nb_checkers=0;
+	game_state->zones[EPos_BarP2].player = EPlayer2;
 	*/
 }
 
@@ -305,6 +318,9 @@ void add_message(engine_state* e_state, char* text, int x, int y, int width, int
 	
 	free(tmp);
 	free(pch);
+	
+	e_state->message_load = false;
+	
 }
 
 void on_click_listener(engine_state* e_state, double ratio)
@@ -357,6 +373,31 @@ void on_click_listener(engine_state* e_state, double ratio)
 				if(res != -1 )
 				{
 					
+		
+		//si il y a un pion de "manger"
+		//printf("mangeag:%i!=%i, %i\n", e_state->g_state.zones[r].player, e_state->current_player->number, e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers);
+		if(e_state->g_state.zones[res].player != e_state->current_player->number && e_state->g_state.zones[res].nb_checkers == 1)
+		{
+			
+			if(e_state->current_player->number == EPlayer1)
+			{
+				e_state->g_state.zones[EPos_BarP2].player = EPlayer2;
+				e_state->g_state.zones[EPos_BarP2].nb_checkers ++;
+				e_state->g_state.zones[res].nb_checkers = 0;
+				
+			}else
+			{
+				e_state->g_state.zones[EPos_BarP1].player = EPlayer1;
+				e_state->g_state.zones[EPos_BarP1].nb_checkers ++;
+				e_state->g_state.zones[res].nb_checkers = 0;
+			}
+			//printf("%i:%i\n", e_state->g_state.zones[EPos_BarP2].nb_checkers, e_state->g_state.zones[EPos_BarP1].nb_checkers);
+			
+		}
+		
+		
+		
+		
 					e_state->g_state.zones[res].nb_checkers++;
 					e_state->g_state.zones[res].player = e_state->current_player->number;
 					e_state->src_selected_checker = -1;
@@ -388,7 +429,7 @@ void on_click_listener(engine_state* e_state, double ratio)
 						{
 							if(e_state->nb_current_possible_moves == 0)
 							{
-								add_message(e_state,"aucun mouvements\npossibles", 700, 455, 330, 220, end_of_turn);
+								add_message(e_state,"aucun mouvements\npossibles", 550, 455, 630, 220, end_of_turn);
 							}
 						}
 					}
@@ -444,6 +485,7 @@ void start_match(engine_state* e_state)
 }
 void start_game(engine_state* e_state)
 {
+	init_game( &(e_state->g_state) );
 	char tmp[100];
 	erase_messages(e_state);
 	if(e_state->g_state.score < e_state->score_to_reach && e_state->g_state.scoreP2 < e_state->score_to_reach)
@@ -455,7 +497,7 @@ void start_game(engine_state* e_state)
 		if( e_state->g_state.score >= e_state->score_to_reach)
 		{
 			sprintf(tmp, "%s\na remporté la partie!", e_state->player_1.name);
-			add_message(e_state,tmp, 700, 455, 330, 220, NULL);
+			add_message(e_state,tmp, 500, 455, 730, 220, init_engine);
 		}
 		else
 		{
@@ -614,8 +656,8 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			}
 			
 			active_player->functions.make_decision(&g_state_cpy, moves, false);
-			printf("A%i:%i/%i\n", active_player->number, moves[0].src_point, moves[0].dest_point);
-			
+			//printf("A%i:%i/%i\n", active_player->number, moves[0].src_point, moves[0].dest_point);
+			printf("SASA; %i\n", moves[0].src_point);
 			while(!moves_valid(moves) && e_state->nb_error_IA < 3)
 			{
 				active_player->functions.make_decision(&g_state_cpy, moves, true);
@@ -630,7 +672,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 				if(active_player->number == EPlayer2)
 				{
 					printf("test 1: %i\n", (e_state->current_player->number));
-					reverse_moves(e_state->current_moves);
+					reverse_moves(e_state, e_state->current_moves);
 					printf("test 2: %i\n", (e_state->current_player->number));
 				}
 				
@@ -747,6 +789,8 @@ void double_stack(engine_state* e_state)
 
 int moves_valid(SMove moves[4])
 {
+	
+	
 	return true;
 	
 }
@@ -774,12 +818,12 @@ void make_moves(engine_state* e_state)
 		nb_dice = 2;
 	}
 
-	while(i < nb_dice && e_state->current_moves[i].src_point != -1 && e_state->current_moves[i].dest_point != -1)
+	while(i < nb_dice && e_state->current_moves[i].src_point >= EPos_1 && e_state->current_moves[i].src_point <= EPos_BarP2 && e_state->current_moves[i].dest_point > 0 && e_state->current_moves[i].dest_point <= EPos_OutP2)
 	{
-		//printf("%i:%i:%i\n", e_state->current_moves[i].src_point, e_state->current_moves[i].dest_point, i);
+		
 		e_state->g_state.zones[e_state->current_moves[i].src_point].nb_checkers--;
 		
-		
+		//si il y a un pion de "manger"
 		if(e_state->g_state.zones[e_state->current_moves[i].dest_point].player != e_state->current_player->number 
 			&& e_state->g_state.zones[e_state->current_moves[i].dest_point].nb_checkers == 1)
 		{
@@ -980,13 +1024,21 @@ int get_selected_checker(engine_state* e_state, int x, int y)
 				if(x <= 110 && x > 10 && y >=10 && y < 510)
 					return EPos_13;
 				break;
-			case EPos_OutP1:
+			case EPos_OutP2:
 				if(x <= 1390 && x > 1290 && y >=35 && y < 485)
+					return EPos_OutP2;
+				break;
+			case EPos_OutP1:
+				if(x <= 1390 && x > 1290 && y >=595 && y < 1045)
 					return EPos_OutP1;
 				break;
-			case EPos_OutP2:
-				if(x <= 110 && x > 10 && y >=595 && y < 1045)
-					return EPos_OutP2;
+			case EPos_BarP1:
+				if(x <= 1855 && x > 1455 && y >=244 && y < 344)
+					return EPos_BarP1;
+				break;
+			case EPos_BarP2:
+				if(x <= 1855 && x > 1455 && y >=959 && y < 1059)
+					return EPos_BarP2;
 				break;
 			default:
 				return -1;
@@ -1017,13 +1069,15 @@ void set_next_possible_moves(engine_state* e_state, int checker)
 void set_possible_destination(engine_state* e_state, int checker_moving)
 {
 	e_state->nb_possible_destinations = 0;
+	
 	e_state->possible_destination = (int*)malloc(e_state->nb_current_possible_moves * sizeof(int));
 	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
 	{
-		if(e_state->current_possible_moves[i].head.src_point == checker_moving )
+		if(e_state->current_possible_moves[i].head.src_point == checker_moving && e_state->current_possible_moves[i].head.dest_point != -1)
 		{
 			e_state->nb_possible_destinations++;
 			e_state->possible_destination[e_state->nb_possible_destinations - 1] = e_state->current_possible_moves[i].head.dest_point;
+			printf("dest:%i\n",e_state->current_possible_moves[i].head.dest_point );
 		}
 
 	}
@@ -1033,14 +1087,14 @@ void set_possible_destination(engine_state* e_state, int checker_moving)
 void throw_dice_HUMAN(engine_state* e_state)
 {
 	
-	SGameState cpy_g_state;
+	
 	erase_messages(e_state);
 	throw_dice(e_state);
 	
 	set_possible_moves(e_state);
 	
 	e_state->first_possible_moves = e_state->current_possible_moves;
-	print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
+	
 }
 
 void end_of_turn(engine_state* e_state)
@@ -1063,20 +1117,14 @@ void reverse_possible_moves(SList_moves** poss_moves, int ln_moves)
 			case EPos_BarP1:
 				plist->head.src_point = EPos_BarP2;
 				break;
-			case EPos_BarP2:
-				plist->head.src_point = EPos_BarP1;
-				break;
 			default:
 				plist->head.src_point = EPos_24 - plist->head.src_point;
 				break;
 		}
 		switch(plist->head.dest_point)
 		{
-			case EPos_BarP1:
-				plist->head.dest_point = EPos_BarP2;
-				break;
-			case EPos_BarP2:
-				plist->head.dest_point = EPos_BarP1;
+			case EPos_OutP1:
+				plist->head.dest_point = EPos_OutP2;
 				break;
 			default:
 				plist->head.dest_point = EPos_24 - plist->head.dest_point;
@@ -1125,12 +1173,22 @@ void set_possible_moves(engine_state* e_state)
 	e_state->first_possible_moves = e_state->current_possible_moves;
 }
 
-void reverse_moves(SMove moves[])
+void reverse_moves(engine_state* e_state, SMove moves[])
 {
 	
 	int i = 0;
+	int nb_dice;
+	if(e_state->g_state.die1 == e_state->g_state.die2)
+	{
+		nb_dice = 4;
+	}
+	else
+	{
+		nb_dice = 2;
+	}
 	
-	while(moves[i].src_point != -1)
+	
+	while(moves[i].src_point != -1 && i < nb_dice)
 	{
 		switch(moves[i].src_point)
 		{
@@ -1148,11 +1206,11 @@ void reverse_moves(SMove moves[])
 		}
 		switch(moves[i].dest_point)
 		{
-			case EPos_BarP1:
-				moves[i].dest_point = EPos_BarP2;
+			case EPos_OutP1:
+				moves[i].dest_point = EPos_OutP2;
 				break;
-			case EPos_BarP2:
-				moves[i].dest_point = EPos_BarP1;
+			case EPos_OutP2:
+				moves[i].dest_point = EPos_OutP1;
 				break;
 			default:
 				moves[i].dest_point = EPos_24 - moves[i].dest_point;

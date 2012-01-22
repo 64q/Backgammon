@@ -41,6 +41,11 @@ typedef struct display_manager
 	SDL_Surface* highlight_up;
 	SDL_Surface* highlight_down;
 	SDL_Surface* highlight_out;
+	SDL_Surface* highlight_bar;
+	
+	int nb_messages_surface;
+	SDL_Surface * messages_surface[10];
+	SDL_Surface * messages_clicked_surface[10];
 	
 	//font
 	TTF_Font *font;
@@ -110,6 +115,11 @@ void switch_to_window(display_manager*);
 void load_images(display_manager*);
 
 void highlight_possible_moves(display_manager* d_manager, engine_state* e_state);
+
+void messages_display(display_manager *d_manager, engine_state* e_state);
+void update_message_surface(display_manager* d_manager, engine_state* e_state);
+void create_message_surface(display_manager* d_manager, SDL_Surface* cible, SDL_Surface* bord, char** text, int nb_lines, int width, int height);
+
 
 #endif
 

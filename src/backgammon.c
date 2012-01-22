@@ -15,7 +15,7 @@
 int main(int argc, char *argv[])
 {
 	
-	int fps = 100;
+	int fps = 30;
 	int delay = 1000/fps;
 	
 	parametre param;

@@ -5,7 +5,7 @@
 
 # Définition des variables usuelles
 CC=gcc
-CFLAGS=-W -Wall -std=c99
+CFLAGS=-W -Wall -std=c99 -g
 LDFLAGS=-lSDL -lSDL_image -lSDL_ttf -lSDL_gfx
 EXEC=backgammon
 LIBNAME=ai
