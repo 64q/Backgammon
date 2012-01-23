@@ -81,7 +81,7 @@ typedef struct engine_state
 	int nb_current_possible_moves;
 	
 	int *possible_destination;
-	int nb_possible_destinations;
+	unsigned int nb_possible_destinations;
 	
 	int is_human_playing;
 	int nb_moves;
@@ -148,5 +148,6 @@ void reverse_possible_moves(SList_moves** poss_moves, int ln_moves);
 void set_possible_moves(engine_state* e_state);
 
 void reverse_moves(engine_state* e_state, SMove moves[]);
+void reload_game(engine_state* e_state);
 #endif
 

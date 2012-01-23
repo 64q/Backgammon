@@ -497,7 +497,7 @@ void start_game(engine_state* e_state)
 		if( e_state->g_state.score >= e_state->score_to_reach)
 		{
 			sprintf(tmp, "%s\na remporté la partie!", e_state->player_1.name);
-			add_message(e_state,tmp, 500, 455, 730, 220, init_engine);
+			add_message(e_state,tmp, 500, 455, 730, 220, reload_game);
 		}
 		else
 		{
@@ -1051,9 +1051,9 @@ int get_selected_checker(engine_state* e_state, int x, int y)
 void set_next_possible_moves(engine_state* e_state, int checker)
 {
 	
-	int i = 0;
+	unsigned int i = 0;
 	
-	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.src_point != e_state->src_selected_checker && e_state->current_possible_moves[i].head.dest_point != checker)
+	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.src_point != (unsigned int)e_state->src_selected_checker && e_state->current_possible_moves[i].head.dest_point != checker)
 	{
 		i++;
 	}
@@ -1094,6 +1094,12 @@ void throw_dice_HUMAN(engine_state* e_state)
 	set_possible_moves(e_state);
 	
 	e_state->first_possible_moves = e_state->current_possible_moves;
+	
+	if(e_state->nb_current_possible_moves == 0)
+	{
+		add_message(e_state,"aucun mouvements\npossibles", 550, 455, 630, 220, end_of_turn);
+	}
+	
 	
 }
 
@@ -1150,7 +1156,7 @@ void set_possible_moves(engine_state* e_state)
 {
 	
 	SGameState cpy_g_state;
-	
+	e_state->current_possible_moves = 0;
 	if(e_state->current_player->number == EPlayer2)
 	{
 		copy_reversed_game_state(&cpy_g_state, &(e_state->g_state));
@@ -1219,4 +1225,24 @@ void reverse_moves(engine_state* e_state, SMove moves[])
 		
 		i++;
 	}
+}
+
+void reload_game(engine_state* e_state)
+{
+	erase_messages(e_state);
+	e_state->g_state.score = 0;
+	e_state->g_state.scoreP2 = 0;
+	init_game(&(e_state->g_state));
+	
+	e_state->message_load = true;	
+	e_state->nb_messages = 0;
+	e_state->stake_owner = EPlayer1 + EPlayer2; //2 ne correspond ni a EPlayer1 ni EPlayer2
+	e_state->src_selected_checker = -1;
+	e_state->nb_error_IA = 0;
+	
+	
+	add_message(e_state, "Jouer!" , 760, 455, 400, 170,  start_match );
+	add_message(e_state,"Quitter" , 760, 650, 400, 170,  shutdown );
+		
+	
 }
