@@ -456,7 +456,7 @@ void on_unclick_listener(engine_state* e_state, double ratio)
 	y /= ratio;
 	for(int i =0; i < e_state->nb_messages; i++)
 	{
-		if(e_state->function[i] != NULL && e_state->tab[i].is_clicked)
+		if((e_state->function[i] != NULL && e_state->tab[i].is_clicked) || 1==1)
 		{
 			e_state->tab[i].is_clicked = false;
 			if( x > e_state->tab[i].position.x && x < e_state->tab[i].position.x + e_state->tab[i].position.w 
@@ -706,7 +706,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 	else
 	{
 		e_state->nb_moves = 0;
-		e_state->is_human_playing = true;
+		
 		if(!e_state->is_first_turn)
 		{
 			erase_messages(e_state);
@@ -714,7 +714,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			
 		}else
 		{
-			
+			e_state->is_human_playing = true;
 			set_possible_moves(e_state);
 	
 			erase_messages(e_state);
@@ -1087,7 +1087,7 @@ void set_possible_destination(engine_state* e_state, int checker_moving)
 void throw_dice_HUMAN(engine_state* e_state)
 {
 	
-	
+	e_state->is_human_playing = true;
 	erase_messages(e_state);
 	throw_dice(e_state);
 	

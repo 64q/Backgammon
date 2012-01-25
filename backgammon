@@ -1,1 +1,1 @@
-bin/backgammon -h Erwan -i libOliver.so -g quentin
+bin/backgammon -i libai.so -i libai.so -g quentin
