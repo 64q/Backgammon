@@ -11,7 +11,7 @@
 #include "../include/engine.h"
 #include "../include/display.h"
 
-void init_display(display_manager* d_manager ,char* name_style)
+void init_display(display_manager* d_manager ,char* name_style, engine_state* e_state)
 {
 	//position du fond
 	d_manager->background_position.x = 0;
@@ -80,7 +80,7 @@ void init_display(display_manager* d_manager ,char* name_style)
 	load_images(d_manager);
 
 	//initialisation de la fenêtre
-	switch_to_window(d_manager);
+	switch_to_window(d_manager, e_state);
 	
 	SDL_WM_SetCaption("BackToGoMan!", NULL);
 	
@@ -138,6 +138,8 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	//on adapte à la bonne résolution
 	SDL_Surface *tmp;
 	tmp = zoomSurface(d_manager->backBuffer, d_manager->ratio, d_manager->ratio, 1);
+	
+	SDL_FillRect(d_manager->screen, NULL, SDL_MapRGB(d_manager->screen->format, 0, 0, 0));
 	
 	SDL_BlitSurface(tmp, NULL, d_manager->screen, &(d_manager->background_position));
 	
@@ -269,13 +271,13 @@ void checker_display(display_manager* d_manager, SGameState* g_state)
 	
 	for(unsigned int i = 0; i < g_state->zones[EPos_OutP2].nb_checkers; i++)
 	{
-		checker_position.y = 470 - i * 15;
+		checker_position.y = 455 - i * 30;
 		SDL_BlitSurface(d_manager->black_out, NULL, d_manager->backBuffer, &(checker_position));
 	}
 	
 	for(unsigned int i = 0; i < g_state->zones[EPos_OutP1].nb_checkers; i++)
 	{
-		checker_position.y = 1030 - i * 15;
+		checker_position.y = 1015 - i * 30;
 		SDL_BlitSurface(d_manager->white_out, NULL, d_manager->backBuffer, &(checker_position));
 	}
 	
@@ -306,9 +308,22 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	noir.b = 0;
 	char* score_string = (char*)malloc(sizeof(char)*4);
 	
+	position.x = 1400;
+	if(e_state->current_player->number == EPlayer1)
+	{
+		position.y = 10;
+		SDL_BlitSurface(d_manager->highlight_player, NULL, d_manager->backBuffer, &position);
+
+	}
+	else if(e_state->current_player->number == EPlayer2)
+	{
+		position.y = 725;
+		SDL_BlitSurface(d_manager->highlight_player, NULL, d_manager->backBuffer, &position);
+
+	}
+
 	
-	
-	/* affichage du type de joueur 2 */
+	/* affichage du type de joueur 1 */
 	position.x= 1430;
 	position.y= 40;
 	
@@ -395,7 +410,6 @@ void messages_display(display_manager *d_manager, engine_state* e_state)
 		
 		position.x = e_state->tab[i].position.x;
 		position.y = e_state->tab[i].position.y;
-		//printf("S%i\n",position.y);
 		if(e_state->tab[i].is_clicked)
 		{
 			SDL_BlitSurface(d_manager->messages_clicked_surface[i], NULL, d_manager->backBuffer, &(position));
@@ -412,20 +426,22 @@ void stake_display(display_manager *d_manager, engine_state* e_state)
 	SDL_Rect pos;
 	pos.x = 0;
 	pos.y = 0;
-	if(e_state->stake_owner == EPlayer1 + EPlayer2)
-	{
-		pos.x = 613;
-		pos.y = 508;
-	}
-	else if(e_state->stake_owner == EPlayer1)
+	
+	if(e_state->stake_owner == EPlayer1)
 	{
 		pos.x = 613;
 		pos.y = 56;
 	}
-	else
+	else if(e_state->stake_owner == EPlayer2)
 	{
 		pos.x = 613;
 		pos.y = 960;
+	}
+	else
+	{
+		pos.x = 613;
+		pos.y = 508;
+	
 	}
 	
 	SDL_BlitSurface(d_manager->stake, NULL, d_manager->backBuffer, &pos);
@@ -533,7 +549,6 @@ void highlight_possible_moves(display_manager *d_manager, engine_state* e_state)
 				SDL_BlitSurface(d_manager->highlight_bar, NULL, d_manager->backBuffer, &(pos));
 			}
 		}
-		
 	}
 }
 
@@ -544,6 +559,7 @@ void moving_checker_display(display_manager* d_manager, engine_state* e_state)
 	SDL_GetMouseState(&(x), &(y)); 
 	pos.x = (x - 25)/d_manager->ratio;
 	pos.y = (y - 25)/d_manager->ratio;
+	pos.y -= d_manager->background_position.y/d_manager->ratio;
 	
 	
 	if(e_state->g_state.zones[e_state->src_selected_checker].player == EPlayer1)
@@ -782,7 +798,7 @@ void free_surface(display_manager* d_manager)
 	SDL_FreeSurface(d_manager->message_border_clicked);
 }
 
-void switch_to_full_screen(display_manager* d_manager)
+void switch_to_full_screen(display_manager* d_manager, engine_state* e_state)
 {
 	if(d_manager->display_mode != FULL_SCREEN)
 	{
@@ -790,10 +806,11 @@ void switch_to_full_screen(display_manager* d_manager)
 		d_manager->screen = SDL_SetVideoMode(d_manager->res_max[0], d_manager->res_max[1], 32, SDL_FULLSCREEN|SDL_DOUBLEBUF);
 		d_manager->display_mode = FULL_SCREEN;
 		d_manager->background_position.y = (int) (d_manager->res_max[1]/2.0 - (d_manager->res_max[0]*9.0/16.0)/2.0);
+		e_state->background_y = d_manager->background_position.y;
 	}
 }
 
-void switch_to_window(display_manager* d_manager)
+void switch_to_window(display_manager* d_manager, engine_state* e_state)
 
 {
 	if(d_manager->display_mode != WINDOW)
@@ -803,6 +820,7 @@ void switch_to_window(display_manager* d_manager)
 		d_manager->screen = SDL_SetVideoMode(d_manager->window_mode_width, d_manager->window_mode_width*9/16, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 		d_manager->display_mode = WINDOW;
 		d_manager->background_position.y = 0;
+		e_state->background_y = d_manager->background_position.y;
 	}
 }
 
@@ -881,6 +899,11 @@ void load_images(display_manager* d_manager)
 	strcpy(path_img_cp, d_manager->path_img);
 	strcat(path_img_cp, "highlight_bar.png");
 	d_manager->highlight_bar = IMG_Load(path_img_cp);
+	
+	strcpy(path_img_cp, d_manager->path_img);
+	strcat(path_img_cp, "highlight_player.png");
+	d_manager->highlight_player = IMG_Load(path_img_cp);
+	
 }
 
 

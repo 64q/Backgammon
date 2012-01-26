@@ -43,6 +43,8 @@ typedef struct display_manager
 	SDL_Surface* highlight_out;
 	SDL_Surface* highlight_bar;
 	
+	SDL_Surface* highlight_player;
+	
 	int nb_messages_surface;
 	SDL_Surface * messages_surface[10];
 	SDL_Surface * messages_clicked_surface[10];
@@ -78,11 +80,8 @@ typedef struct display_manager
 
 //initialise la structure d'affichage et ouvre la fenetre
 //path_img correspond au chemin d'accèes des imgages
-void init_display(display_manager* ,char*);
+void init_display(display_manager* ,char*, engine_state*);
 
-
-//affiche les pions (private)
-void checker_display(display_manager*, SGameState*  );
 
 //affiche les pions
 void checker_display(display_manager*, SGameState*);
@@ -106,10 +105,10 @@ void stake_display(display_manager *d_manager, engine_state* e_state);
 void free_surface(display_manager*);
 
 //change le mode d'affichage en plein écran
-void switch_to_full_screen(display_manager*);
+void switch_to_full_screen(display_manager*, engine_state*);
 
 //change le mode d'affichage en mode fenetré
-void switch_to_window(display_manager*);
+void switch_to_window(display_manager*, engine_state*);
 
 //charge toutes les images du jeu (private)
 void load_images(display_manager*);

@@ -23,16 +23,13 @@ int main(int argc, char *argv[])
 
 	
 	
-	display_manager d_manager;
-	init_display(&d_manager, param.style);
-	
-	
-	
+		
 	engine_state e_state;
 	init_engine(&e_state,param.name_player_1 , param.type_player_1 , param.name_player_2, param.type_player_2 );
 	
 
-	
+	display_manager d_manager;
+	init_display(&d_manager, param.style, &e_state);
 	
 	
 
@@ -56,11 +53,11 @@ int main(int argc, char *argv[])
 				case SDL_KEYDOWN:
 					if (keystates[SDLK_LEFT]) 
 					{ 
-						switch_to_full_screen(&d_manager);
+						switch_to_full_screen(&d_manager, &e_state);
 					}
 					if (keystates[SDLK_RIGHT]) 
 					{ 
-						switch_to_window(&d_manager);
+						switch_to_window(&d_manager, &e_state);
 						
 					}
 					if (keystates[SDLK_UP]) 

@@ -90,6 +90,8 @@ typedef struct engine_state
 	
 	int nb_error_IA;
 	int is_first_turn;
+	
+	int background_y;
 
 }engine_state;
 
@@ -149,5 +151,6 @@ void set_possible_moves(engine_state* e_state);
 
 void reverse_moves(engine_state* e_state, SMove moves[]);
 void reload_game(engine_state* e_state);
+void stake_discussion(engine_state* e_state);
 #endif
 
