@@ -215,72 +215,7 @@ void init_game(SGameState * game_state)
 	game_state->zones[EPos_BarP2].nb_checkers=0;
 	game_state->zones[EPos_BarP2].player = EPlayer2;
 	
-	 /*
-	game_state->zones[EPos_1].player = -1;
-	game_state->zones[EPos_1].nb_checkers = 0;
 	
-	int i;
-	for(i = EPos_2; i<=EPos_5; i++)
-	{
-		game_state->zones[i].nb_checkers = 0;
-		game_state->zones[i].player = -1;
-	}
-	
-	game_state->zones[EPos_6].player = EPlayer1;
-	game_state->zones[EPos_6].nb_checkers = 15;
-	
-	game_state->zones[EPos_7].nb_checkers = 0;
-	game_state->zones[EPos_7].player = -1;
-	
-	game_state->zones[EPos_8].player = -1;
-	game_state->zones[EPos_8].nb_checkers = 0;
-	
-	for(i = EPos_9; i<=EPos_11; i++)
-	{
-		game_state->zones[i].nb_checkers = 0;
-		game_state->zones[i].player = -1;
-	}
-	
-	game_state->zones[EPos_12].player = -1;
-	game_state->zones[EPos_12].nb_checkers = 0;
-	
-	game_state->zones[EPos_13].player = -1;
-	game_state->zones[EPos_13].nb_checkers = 0;
-	
-	for(i = EPos_14; i<=EPos_16; i++)
-	{
-		game_state->zones[i].nb_checkers = 0;
-		game_state->zones[i].player = -1;
-	}
-	
-	game_state->zones[EPos_17].player = -1;
-	game_state->zones[EPos_17].nb_checkers = 0;
-	
-	game_state->zones[EPos_18].player = -1;
-	game_state->zones[EPos_18].nb_checkers = 0;
-	
-	game_state->zones[EPos_19].player = EPlayer2;
-	game_state->zones[EPos_19].nb_checkers = 15;
-	
-	for(i = EPos_20; i<=EPos_23; i++)
-	{
-		game_state->zones[i].nb_checkers = 0;
-		game_state->zones[i].player = -1;
-	}
-	
-	game_state->zones[EPos_24].player = -1;
-	game_state->zones[EPos_24].nb_checkers = 0;
-	
-	game_state->zones[EPos_OutP1].nb_checkers=0;
-	game_state->zones[EPos_OutP1].player = EPlayer1;
-	game_state->zones[EPos_BarP1].nb_checkers=0;
-	game_state->zones[EPos_BarP1].player = EPlayer1;
-	
-	game_state->zones[EPos_OutP2].nb_checkers=0;
-	game_state->zones[EPos_OutP2].player = EPlayer2;
-	game_state->zones[EPos_BarP2].nb_checkers=0;
-	game_state->zones[EPos_BarP2].player = EPlayer2;
-	*/
 }
 
 
@@ -289,10 +224,10 @@ void add_message(engine_state* e_state, char* text, int x, int y, int width, int
 {
 	e_state->tab[e_state->nb_messages].lines = (char**)malloc(sizeof(char*)*5);
 	
-	char* tmp = (char*)malloc(sizeof(char)*100);
+	char* tmp = (char*)malloc(sizeof(char)*100);;
 	strcpy(tmp, text);
 	
-	char * pch = (char*)malloc(sizeof(char)*100);
+	char * pch = (char*)malloc(sizeof(char)*100);;
 	
 	pch = strtok (tmp,"\n");
 	int i = 0;
@@ -315,7 +250,7 @@ void add_message(engine_state* e_state, char* text, int x, int y, int width, int
 	
 	e_state->nb_messages ++;
 	
-	free(tmp);
+	
 	free(pch);
 	
 	e_state->message_load = false;
@@ -349,7 +284,7 @@ void on_click_listener(engine_state* e_state, double ratio)
 	//si le joueur courant est humain, si il clic sur un pion autorisé, on enregistre le pion en cours de transport ainsi que d'où il vient
 	if(e_state->nb_messages == 0)
 	{
-		if( e_state->is_human_playing)
+		if( e_state->current_player->type == HUMAN)
 		{
 			//si aucun pion n'est selectionné on cherche un pion à bouger
 			if(e_state->src_selected_checker == -1)
@@ -381,7 +316,6 @@ void on_click_listener(engine_state* e_state, double ratio)
 							e_state->g_state.zones[EPos_BarP2].player = EPlayer2;
 							e_state->g_state.zones[EPos_BarP2].nb_checkers ++;
 							e_state->g_state.zones[res].nb_checkers = 0;
-							
 						}else
 						{
 							e_state->g_state.zones[EPos_BarP1].player = EPlayer1;
@@ -398,34 +332,19 @@ void on_click_listener(engine_state* e_state, double ratio)
 					e_state->nb_moves++;
 					
 					
-					if(e_state->g_state.die1 == e_state->g_state.die2)
+					
+					if(e_state->nb_moves == e_state->current_possible_moves_depth)
 					{
-						if(e_state->nb_moves == 4)
-						{
-							end_of_turn(e_state);
-						}
-						else
-						{
-							if(e_state->nb_current_possible_moves == 0)
-							{
-								add_message(e_state,"aucun mouvements\npossibles", 550, 455, 630, 220, end_of_turn);
-							}
-						}
+						end_of_turn(e_state);
 					}
 					else
 					{
-						if(e_state->nb_moves == 2)
+						if(e_state->nb_current_possible_moves == 0)
 						{
-							end_of_turn(e_state);
-						}
-						else
-						{
-							if(e_state->nb_current_possible_moves == 0)
-							{
-								add_message(e_state,"aucun mouvements\npossibles", 550, 455, 630, 220, end_of_turn);
-							}
+							add_message(e_state,"aucun mouvements\npossibles", 550, 455, 630, 220, end_of_turn);
 						}
 					}
+					
 
 				}
 				else
@@ -497,7 +416,7 @@ void start_game(engine_state* e_state)
 		else
 		{
 			sprintf(tmp, "%s\na remporté la partie!", e_state->player_2.name);
-			add_message(e_state,tmp, 480, 422, 330, 225, NULL);
+			add_message(e_state,tmp, 278, 428, 730, 225, reload_game);
 		}
 	}
 }
@@ -580,7 +499,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 	char tmp[100];
 	if( active_player->type == IA )
 	{
-		e_state->is_human_playing = false;
+		
 		
 		if(!e_state->is_first_turn)
 		{
@@ -625,20 +544,22 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			
 			active_player->functions.make_decision(&g_state_cpy, moves, false);
 			
-			while(!moves_valid(moves) && e_state->nb_error_IA < 3)
+			copy_moves(e_state->current_moves, moves);
+			if(active_player->number == EPlayer2)
 			{
-				active_player->functions.make_decision(&g_state_cpy, moves, true);
+				reverse_moves(e_state, e_state->current_moves);
+			}		
+			
+			while(!moves_valid(e_state, e_state->current_moves) && e_state->nb_error_IA < 3)
+			{
+				active_player->functions.make_decision(&g_state_cpy, e_state->current_moves, true);
 				e_state->nb_error_IA ++;
 			}
 			
-			if(moves_valid(moves))
+			if(moves_valid(e_state, e_state->current_moves))
 			{
 				
-				copy_moves(e_state->current_moves, moves);
-				if(active_player->number == EPlayer2)
-				{
-					reverse_moves(e_state, e_state->current_moves);
-				}				
+						
 				
 				erase_messages(e_state);
 				if(e_state->is_first_turn)
@@ -649,7 +570,8 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 				}else
 				{
 					sprintf(tmp, "%s\nva jouer", active_player->name);
-					add_message(e_state,tmp, 382, 391, 520, 225, make_moves);
+					//add_message(e_state,tmp, 382, 391, 520, 225, make_moves);
+					make_moves(e_state);
 				}
 				
 			}
@@ -680,7 +602,7 @@ void play_turn(engine_state* e_state, player* active_player, player* opponent)
 			
 		}else
 		{
-			e_state->is_human_playing = true;
+			
 			set_possible_moves(e_state);
 	
 			erase_messages(e_state);
@@ -751,6 +673,7 @@ void double_stack(engine_state* e_state)
 	{
 		e_state->stake_owner = EPlayer1;
 	}
+	
 	if(e_state->current_player->type == HUMAN)
 	{
 		add_message(e_state,"lancer les\ndés", 382, 391, 520, 225, throw_dice_HUMAN);
@@ -758,11 +681,38 @@ void double_stack(engine_state* e_state)
 	
 }
 
-int moves_valid(SMove moves[4])
+int moves_valid(engine_state* e_state, SMove moves[4])
 {
 	
+	SList_moves* tmp = e_state->current_possible_moves;
 	
+	int size = e_state->nb_current_possible_moves;
+	int i = 0;
+	int j = 0;
+	while(size != 0)
+	{
+		
+		while(i < size && tmp[i].head.src_point != moves[j].src_point && tmp[i].head.dest_point != moves[j].dest_point)
+		{
+			i++;
+		}
+		
+		if(i < size) //si un mouvement correspondant a été trouvé
+		{
+			size = tmp[i].l_nexts;
+			tmp = tmp[i].nexts;
+			i = 0;
+			j++;
+		}
+		else
+		{
+			return false;
+			
+		}
+		
+	}
 	return true;
+	
 	
 }
 
@@ -780,15 +730,7 @@ void make_moves(engine_state* e_state)
 	int i = 0;
 	int nb_dice;
 	
-	if(e_state->g_state.die1 == e_state->g_state.die2)
-	{
-		nb_dice = 4;
-	}
-	else
-	{
-		nb_dice = 2;
-	}
-
+	nb_dice = e_state->current_possible_moves_depth;
 	while(i < nb_dice && e_state->current_moves[i].src_point >= EPos_1 && e_state->current_moves[i].src_point <= EPos_BarP2 && e_state->current_moves[i].dest_point > 0 && e_state->current_moves[i].dest_point <= EPos_OutP2)
 	{
 		
@@ -1023,7 +965,7 @@ void set_next_possible_moves(engine_state* e_state, int checker)
 	
 	unsigned int i = 0;
 	
-	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.src_point != (unsigned int)e_state->src_selected_checker && e_state->current_possible_moves[i].head.dest_point != checker)
+	while(i < e_state->nb_current_possible_moves && e_state->current_possible_moves[i].head.src_point != (unsigned int)e_state->src_selected_checker && e_state->current_possible_moves[i].head.dest_point != (unsigned int)checker)
 	{
 		i++;
 	}
@@ -1041,9 +983,9 @@ void set_possible_destination(engine_state* e_state, int checker_moving)
 	e_state->nb_possible_destinations = 0;
 	
 	e_state->possible_destination = (int*)malloc(e_state->nb_current_possible_moves * sizeof(int));
-	for(int i = 0; i < e_state->nb_current_possible_moves; i++)
+	for(unsigned int i = 0; i < e_state->nb_current_possible_moves; i++)
 	{
-		if(e_state->current_possible_moves[i].head.src_point == checker_moving && e_state->current_possible_moves[i].head.dest_point != -1)
+		if(e_state->current_possible_moves[i].head.src_point == (unsigned int)checker_moving && e_state->current_possible_moves[i].head.dest_point >= 0)
 		{
 			e_state->nb_possible_destinations++;
 			e_state->possible_destination[e_state->nb_possible_destinations - 1] = e_state->current_possible_moves[i].head.dest_point;
@@ -1126,25 +1068,21 @@ void set_possible_moves(engine_state* e_state)
 	
 	SGameState cpy_g_state;
 	e_state->current_possible_moves = 0;
+	int tmp;
 	if(e_state->current_player->number == EPlayer2)
 	{
 		copy_reversed_game_state(&cpy_g_state, &(e_state->g_state));
 		
-		calc_moves(&cpy_g_state, &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
-		//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
+		calc_moves(&cpy_g_state, &(e_state->current_possible_moves), &tmp, 0, 0);
+		e_state->nb_current_possible_moves = (unsigned int)tmp;
 		reverse_possible_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves);
-		//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
-		
 	}
 	else
 	{
-		//copy_reversed_game_state(&cpy_g_state, &(e_state->g_state));
-		calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &(e_state->nb_current_possible_moves), 0, 0);
-		//reverse_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves);
-		//print_poss_moves(&(e_state->current_possible_moves), e_state->nb_current_possible_moves,0);
-		
+		calc_moves(&(e_state->g_state), &(e_state->current_possible_moves), &tmp, 0, 0);		
+		e_state->nb_current_possible_moves = (unsigned int)tmp;
 	}
-	
+	e_state->current_possible_moves_depth = get_SList_depth(e_state->current_possible_moves, e_state->nb_current_possible_moves);
 	e_state->first_possible_moves = e_state->current_possible_moves;
 }
 
@@ -1153,17 +1091,10 @@ void reverse_moves(engine_state* e_state, SMove moves[])
 	
 	int i = 0;
 	int nb_dice;
-	if(e_state->g_state.die1 == e_state->g_state.die2)
-	{
-		nb_dice = 4;
-	}
-	else
-	{
-		nb_dice = 2;
-	}
+	nb_dice = e_state->current_possible_moves_depth;
 	
 	
-	while(moves[i].src_point != -1 && i < nb_dice)
+	while(moves[i].src_point >= 0 && i < nb_dice)
 	{
 		switch(moves[i].src_point)
 		{
@@ -1216,6 +1147,7 @@ void reload_game(engine_state* e_state)
 
 void stake_discussion(engine_state* e_state)
 {
+	
 	erase_messages(e_state);
 	player* opponent = e_state->pending_player;
 	player* active_player = e_state->current_player;
@@ -1247,4 +1179,18 @@ void stake_discussion(engine_state* e_state)
 			add_message(e_state,"OUI", 206, 600, 300, 175, double_stack);
 			add_message(e_state,"NON", 806, 600, 300, 175, give_up);
 		}
+}
+
+int get_SList_depth(SList_moves* moves, int lp_moves)
+{
+	int depth = 0;
+	int size = lp_moves;
+	SList_moves* tmp = moves;
+	while(size != 0)
+	{
+		depth++;
+		size = tmp[0].l_nexts;
+		tmp = tmp[0].nexts;
+	}
+	return depth;
 }

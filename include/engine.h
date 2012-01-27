@@ -12,7 +12,10 @@
 #define IA 1
 #define HUMAN 2
 
-
+typedef struct rect
+{
+	int x, y, w, h;
+}rect;
 typedef struct message
 {
 	//tableau des lignes composant le message
@@ -20,7 +23,7 @@ typedef struct message
 	int nb_lines;
 	
 	//contient la position et la taille du message
-	SDL_Rect position;
+	rect position;
 	
 	bool is_clicked;
 	
@@ -78,12 +81,13 @@ typedef struct engine_state
 	SList_moves* first_possible_moves;
 	int nb_first_possible_moves;
 	SList_moves* current_possible_moves;
-	int nb_current_possible_moves;
+	unsigned int nb_current_possible_moves;
 	
 	int *possible_destination;
 	unsigned int nb_possible_destinations;
 	
-	int is_human_playing;
+	int current_possible_moves_depth;
+	
 	int nb_moves;
 	
 	int src_selected_checker;
@@ -133,7 +137,7 @@ void copy_reversed_game_state(SGameState* g_state_cpy, SGameState* g_state);
 void play_turn(engine_state* e_state, player* active_player, player* opponent);
 
 void double_stack(engine_state* e_state);
-int moves_valid(SMove moves[4]);
+int moves_valid(engine_state* e_state, SMove moves[4]);
 void copy_moves(SMove cpy[4], SMove original[4]);
 
 void make_moves(engine_state* e_state);
@@ -152,5 +156,7 @@ void set_possible_moves(engine_state* e_state);
 void reverse_moves(engine_state* e_state, SMove moves[]);
 void reload_game(engine_state* e_state);
 void stake_discussion(engine_state* e_state);
+
+int get_SList_depth(SList_moves* moves, int lp_moves);
 #endif
 

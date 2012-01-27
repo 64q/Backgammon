@@ -68,23 +68,21 @@ void init_display(display_manager* d_manager ,char* name_style, engine_state* e_
 	//icone
 	strcpy(path_img_cp, tmp);
 	strcat(path_img_cp, "icone.png");
-	
-	
 	SDL_WM_SetIcon(IMG_Load(path_img_cp), NULL);
 
-	
-	
-    
-	
+
 	//chargement des images
 	load_images(d_manager);
 
+	//initialisation des tableaux de messages
+	init_messages(d_manager);
+	
 	//initialisation de la fenêtre
 	switch_to_window(d_manager, e_state);
 	
 	SDL_WM_SetCaption("BackToGoMan!", NULL);
 	
-	//création du buffer qui va contenir toute l'interface en 1920*1080 et qui v être redimensionné dans screen
+	//création du buffer qui va contenir toute l'interface en 1920*1080 et qui va être redimensionné dans screen
 	d_manager->backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 1920, 1080, 32,0,0,0,0);
 	
 	
@@ -102,7 +100,7 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	pos.y = 0;
 	SDL_BlitSurface(d_manager->background, NULL, d_manager->backBuffer, &(pos));
 	
-	if(e_state->is_human_playing == true)
+	if(e_state->current_player->type == HUMAN)
 	{
 		highlight_possible_moves(d_manager, e_state);
 	}
@@ -127,7 +125,7 @@ void interface_display(display_manager* d_manager, engine_state* e_state)
 	//mise
 	stake_display(d_manager, e_state);
 	
-	if(e_state->is_human_playing && e_state->src_selected_checker != -1)
+	if(e_state->current_player->type == HUMAN && e_state->src_selected_checker != -1)
 	{
 		moving_checker_display(d_manager, e_state);
 	}
@@ -306,8 +304,9 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
 	noir.r = 0;
 	noir.g = 0;
 	noir.b = 0;
-	char* score_string = (char*)malloc(sizeof(char)*4);
+	char score_string[4];
 	
+	//affichage du fond qui indique le joueur courant
 	position.x = 1400;
 	if(e_state->current_player->number == EPlayer1)
 	{
@@ -373,7 +372,7 @@ void infos_display(display_manager* d_manager, engine_state* e_state)
     texte = TTF_RenderText_Blended(d_manager->font, score_string, noir );
 	SDL_BlitSurface(texte, NULL, d_manager->backBuffer, &(position));
 	
-	free(score_string);
+	
 }
 
 void die_display(display_manager* d_manager, unsigned int val, int x, int y)
@@ -400,14 +399,13 @@ void die_display(display_manager* d_manager, unsigned int val, int x, int y)
 
 void messages_display(display_manager *d_manager, engine_state* e_state)
 {
-	
+	//on met à jour les messages qui ont potentiellement été rajouté dans le engine.c
 	update_message_surface(d_manager, e_state);
 	
-	
+	//affichage de tous les messages stockés sous la forme de SDL_Surface dans d_manager
 	SDL_Rect position;
 	for(int i = 0; i < d_manager->nb_messages_surface; i++)
 	{
-		
 		position.x = e_state->tab[i].position.x;
 		position.y = e_state->tab[i].position.y;
 		if(e_state->tab[i].is_clicked)
@@ -427,6 +425,7 @@ void stake_display(display_manager *d_manager, engine_state* e_state)
 	pos.x = 0;
 	pos.y = 0;
 	
+	//affichage de la mise suivant le possesseur
 	if(e_state->stake_owner == EPlayer1)
 	{
 		pos.x = 613;
@@ -451,12 +450,12 @@ void stake_display(display_manager *d_manager, engine_state* e_state)
 	noir.g = 0;
 	noir.b = 0;
 	
-	
+	//affichage de la valeur de la mise
 	int stake_tmp = e_state->g_state.stake;
 	if(e_state->g_state.stake == 1)
 		stake_tmp = 64;
 	
-		sprintf(stake_str, "%i", stake_tmp);
+	sprintf(stake_str, "%i", stake_tmp);
 	SDL_Surface * texte = TTF_RenderText_Blended(d_manager->font,stake_str , noir );
 	pos.x = 645 - texte->w / 2;
 	pos.y = pos.y + 32 - texte->h / 2;
@@ -469,24 +468,30 @@ void highlight_possible_moves(display_manager *d_manager, engine_state* e_state)
 	int nb_pos;
 	int size_tab;
 	
-	
+	//si il n'y a pas encore de pion sélectionné
 	if(e_state->src_selected_checker == -1)
 	{
+		//on prend le nombre de pions déplaçables
 		size_tab = e_state->nb_current_possible_moves;
 		
 	}
 	else
 	{
+		//on prend le nombre de destinations possibles
 		size_tab = e_state->nb_possible_destinations;
 	}
+	
+	//on affiche les zones concerné 
 	for(int i = 0; i < size_tab; i++)
 	{
 		if(e_state->src_selected_checker == -1)
 		{
+			//zones de laquelle on peut prendre un pion 
 			nb_pos = e_state->current_possible_moves[i].head.src_point;
 		}
 		else
 		{
+			//ou alors celle ou l'on peut en déposer
 			nb_pos = e_state->possible_destination[i];
 		}
 		
@@ -557,8 +562,14 @@ void moving_checker_display(display_manager* d_manager, engine_state* e_state)
 	SDL_Rect pos;
 	int x, y;
 	SDL_GetMouseState(&(x), &(y)); 
+	
+	/*les coordonnées de la souris sont dans données dans la résolution de la fenetre, 
+	hors on affiche les images dans une image en 1920*1080, il faut donc adapter la position
+	de l'affichage du pion avec le ratio*/
 	pos.x = (x - 25)/d_manager->ratio;
 	pos.y = (y - 25)/d_manager->ratio;
+	
+	//si l'écran n'est pas 16/9, l'affichage est décalé en y pour être centrée, i lfaut donc également adpaté cela
 	pos.y -= d_manager->background_position.y/d_manager->ratio;
 	
 	
@@ -568,15 +579,20 @@ void moving_checker_display(display_manager* d_manager, engine_state* e_state)
 	if(e_state->g_state.zones[e_state->src_selected_checker].player == EPlayer2)
 		SDL_BlitSurface(d_manager->black, NULL, d_manager->backBuffer, &(pos));
 }
+
 void update_message_surface(display_manager* d_manager, engine_state* e_state)
 {
 	int width, height;
 	char** text;
 	int nb_lines;
+	
+	//on vérifie qu'il y a des nouveaux messages à créer
 	if(e_state->message_load == false)
 	{
+		//si il y a des nouveaux messages, on recrée toutes la liste
 		d_manager->nb_messages_surface = 0;
 	}
+	
 	while(d_manager->nb_messages_surface < e_state->nb_messages)
 	{
 		width = e_state->tab[d_manager->nb_messages_surface].position.w;
@@ -584,16 +600,22 @@ void update_message_surface(display_manager* d_manager, engine_state* e_state)
 		text = e_state->tab[d_manager->nb_messages_surface].lines;
 		nb_lines = e_state->tab[d_manager->nb_messages_surface].nb_lines;
 		
-		
+		//on libère les anciennes surfaces des messages
+		SDL_FreeSurface(d_manager->messages_clicked_surface[d_manager->nb_messages_surface ]);
+		SDL_FreeSurface(d_manager->messages_surface[d_manager->nb_messages_surface ]);
+
+		//on crée les surfaces qui vont accueillir les messages
 		d_manager->messages_surface[d_manager->nb_messages_surface ] = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32, 0, 0, 0, 0);
 		d_manager->messages_clicked_surface[d_manager->nb_messages_surface ] = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32, 0, 0, 0, 0);
 
+		//on remplit les surfaces
 		create_message_surface(d_manager, d_manager->messages_surface[d_manager->nb_messages_surface ], d_manager->message_border, text, nb_lines, width, height);
 		create_message_surface(d_manager, d_manager->messages_clicked_surface[d_manager->nb_messages_surface ], d_manager->message_border_clicked, text, nb_lines, width, height);
 	
 		d_manager->nb_messages_surface++;
 	}
 	
+	//si on a simplement supprimer les messages sans en re=ajouter, on libère le tout
 	while(d_manager->nb_messages_surface > e_state->nb_messages)
 	{
 		
@@ -796,6 +818,16 @@ void free_surface(display_manager* d_manager)
     SDL_FreeSurface(d_manager->dice);
 	SDL_FreeSurface(d_manager->message_border);
 	SDL_FreeSurface(d_manager->message_border_clicked);
+	
+	SDL_FreeSurface(d_manager->stake);
+	SDL_FreeSurface(d_manager->highlight_up);
+	SDL_FreeSurface(d_manager->highlight_down);
+	SDL_FreeSurface(d_manager->highlight_out);
+	SDL_FreeSurface(d_manager->highlight_bar);
+	SDL_FreeSurface(d_manager->highlight_player);
+	TTF_CloseFont(d_manager->font);
+	free(d_manager->path_img);
+	
 }
 
 void switch_to_full_screen(display_manager* d_manager, engine_state* e_state)
@@ -906,5 +938,15 @@ void load_images(display_manager* d_manager)
 	
 }
 
+void init_messages(display_manager* d_manager)
+{
+	for(int i = 0; i < 10; i++)
+	{
+		d_manager->messages_surface[i] = NULL;
+		d_manager->messages_clicked_surface[i] = NULL;
+		
+	}
+	
+}
 
 
